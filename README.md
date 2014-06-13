@@ -11,9 +11,11 @@ The ladder program presumes `/usr/share/dict/words`, so you can use it in these 
 `go build`
 
 _answer the question posted to golang-nuts about 4-letter words_
+
 `./ladder -n 4`
 
 _get detailed timing information_
+
 `./ladder -t -n 4`
 
 _get a variety of interesting facts by raising the verbosity level_
