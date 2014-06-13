@@ -91,6 +91,4 @@ mkdir words
 
 ...using whatever looping/shell structure makes sense to you.
 
-If I figure out how to make a subdirectory at Github, then I'll upload some interesting 
-test files. (Moby Dick, Alice in Wonderland, and famous speeches by Abraham Lincoln and 
-Rev. Martin Luther King, Jr.)
+The files are there now.
