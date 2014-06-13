@@ -20,7 +20,7 @@ import (
 
 const WIDEST = 20
 
-type Index uint32 // array index type for node and edge lists
+type Index uint32 // index type for node and edge lists
 const INFINITY = 1 << 30
 
 type Indexes []Index
@@ -443,7 +443,7 @@ func sumAllSourcesShortestPaths(word []string, pair []Indexes, component []Compo
 	var i, j, totalPairs, totalPaths int
 	components := len(component)
 
-	// PHASE 1 -- solve large problems sequentially, using parallel workers fo each
+	// PHASE 1 -- solve large problems sequentially, using parallel workers for each
 	for ; i < components && component[i].words >= BREAKPOINT; i++ {
 		c := component[i]
 		totalPairs += c.words * (c.words - 1)
