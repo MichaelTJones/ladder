@@ -1,7 +1,9 @@
 ladder
 ======
 
-Efficient solution of all points shortest paths probem in Go. The code here is associated with the following golang-nuts discussion about approach, parallelism, efficiency, timing, and so on.
+Efficient solution of all points shortest paths probem in Go. The code here is associated 
+with the following golang-nuts discussion about approach, parallelism, efficiency, timing, 
+and so on.
 
 https://groups.google.com/forum/#!topic/golang-nuts/ScFRRxqHTkY
 
@@ -9,28 +11,29 @@ The ladder program presumes /usr/share/dict/words, so you can use it in these wa
 
 go build
 
-# answer the question posted to golang-nuts about 4-letter words
+answer the question posted to golang-nuts about 4-letter words
 ./ladder -n 4
 
-# get detailed timing information
+get detailed timing information
 ./ladder -t -n 4
 
-# get a variety of interesting facts by raising the verbosity level
+get a variety of interesting facts by raising the verbosity level
 ./ladder -v 1 -n 4
 ./ladder -v 2 -n 4
 ./ladder -v 3 -n 4
 
 To go fast and understand the parallelism approach, be sure to set GOMAXPROCS.
 
-# use 4 cores and 4 SMT phantom CPUs to process all of /usr/share/dict/words
+use 4 cores and 4 SMT phantom CPUs to process all of /usr/share/dict/words
 export GOMAXPROCS=8
 ./ladder -v 1
 
 Be sure to watch the resource usage graphs if you have that.
 
-There are benchmarks, but no tests (I've not been able to find any other data to test against that says what the sum of lengths of all shortest paths is for some word set.) To test:
+There are benchmarks, but no tests (I've not been able to find any other data to test against 
+that says what the sum of lengths of all shortest paths is for some word set.) To test:
 
-# choose your parallelism level
+choose your parallelism level
 export GOMAXPROCS=8
 go test -v -bench=.
 
@@ -47,7 +50,6 @@ You'll also want some sample word lists. The tests expect a subdirectory named w
 I was lazy when I built my files, using this bash script:
 
 mtj$ cat BUILD 
-#! /bin/sh
 grep "^.$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-1
 grep "^..$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-2
 grep "^...$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-3
@@ -69,7 +71,7 @@ grep "^..................$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-18
 grep "^...................$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-19
 grep "^....................$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-20
 
-however, now that my program exists, it would be fine to do the following:
+however, now that the program exists, it would be fine to do the following:
 
 go build 
 mkdir words
@@ -80,4 +82,5 @@ mkdir words
 
 ...using whatever looping/shell structure makes sense to you.
 
-If I figure out how to make a subdirectory at Github, then I'll upload some interesting test files. (the above, Moby Dick, Alice in Wonderland, and speeches by Abraham Lincoln and Rev. Martin Luther King, Jr.)
+If I figure out how to make a subdirectory at Github, then I'll upload some interesting test files. 
+(Moby Dick, Alice in Wonderland, and speeches by Abraham Lincoln and Rev. Martin Luther King, Jr.)
