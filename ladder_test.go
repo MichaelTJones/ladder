@@ -77,6 +77,16 @@ func TestLinearGraphsV2(t *testing.T) {
 	}
 }
 
+// fully-connected 4-node graph
+//
+//  O ----- O
+//  | \   / |
+//  |  \ /  |
+//  |   X   |
+//  |  / \  |
+//  | /   \ |
+//  O ----- O
+
 // every node is connected to every other node, all shortest paths have length one
 func buildFullyConnectedGraph(n int) ([]string, []Indexes, []Component) {
 	node := make([]string, n)
@@ -124,6 +134,100 @@ func TestFullyConnectedGraphsV2(t *testing.T) {
 		path1 := n * (n - 1)
 
 		node, edge, component := buildFullyConnectedGraph(n)
+		pair2, path2 := sumAllSourcesShortestPathsV2(node, edge, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+// build lattice graph
+//
+//  3x4:
+//    O --- O --- O --- O
+//    |     |     |     |
+//    O --- O --- O --- O
+//    |     |     |     |
+//    O --- O --- O --- O
+
+func buildLatticeGraph(rows, cols int) ([]string, []Indexes, []Component) {
+	n := rows * cols
+	node := make([]string, n)
+	// for r := 0; r < rows; r++ {
+	// 	for c := 0; c < cols; c++ {
+	// 		node[row*cols+col] = fmt.Sprintf("n[%d][%d]", row, col)
+	// 	}
+	// }
+
+	edge := make([]Indexes, n)
+
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			i := r*cols + c
+
+			if r > 0 {
+				edge[i] = append(edge[i], Index((r-1)*cols+c)) // UP
+			}
+			if c > 0 {
+				edge[i] = append(edge[i], Index(i-1)) // LEFT: i-1 == r*cols+(c-1)
+			}
+			if c < cols-1 {
+				edge[i] = append(edge[i], Index(i+1)) // RIGHT: i+1 == r*cols+(c+1)
+			}
+			if r < rows-1 {
+				edge[i] = append(edge[i], Index((r+1)*cols+c)) // DOWN
+			}
+
+		}
+	}
+
+	member := make([]Index, n)
+	for i := range member {
+		member[i] = Index(i)
+	}
+	component := []Component{{member, n}}
+
+	return node, edge, component
+}
+
+//                 sum of
+//       pairs      paths
+//  2:      12         16
+//  3:      72        144
+//  4:     240        640
+//  5:     600       2000
+//  6:    1260       5040
+//  7:    2352      10976
+//  8:    4032      21504
+//  :       :          :
+// 37: 1872792   46195536
+// 38: 2083692   52786864
+// 39: 2311920   60109920
+// 40: 2558400   68224000
+
+func TestLatticeGraphsV1(t *testing.T) {
+	// test paths on square n x n lattices
+	for n := 2; n <= 40; n++ {
+		pair1 := (n * n) * (n*n - 1)
+		path1 := (2 * (n - 1) * n * n * n * (n + 1)) / 3
+
+		node, edge, component := buildLatticeGraph(n, n)
+		pair2, path2 := sumAllSourcesShortestPathsV1(node, edge, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+func TestLatticeGraphsV2(t *testing.T) {
+	// test paths on square n x n lattices
+	for n := 2; n <= 40; n++ {
+		pair1 := (n * n) * (n*n - 1)
+		path1 := (2 * (n - 1) * n * n * n * (n + 1)) / 3
+
+		node, edge, component := buildLatticeGraph(n, n) // square n x n lattice
 		pair2, path2 := sumAllSourcesShortestPathsV2(node, edge, component)
 
 		if pair1 != pair2 || path1 != path2 {
