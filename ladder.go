@@ -20,7 +20,7 @@ import (
 
 const WIDEST = 20
 
-type Index uint32 // index type for node and edge lists
+type Index uint32 // array index type for node and edge lists
 const INFINITY = 1 << 30
 
 type Indexes []Index
@@ -99,13 +99,27 @@ func main() {
 	}
 
 	// count one shortest length path between each word pair in each component
-	count, total := sumAllSourcesShortestPaths(word, pair, component)
-	if timing {
-		meter.SetWork(float64(count)) // paths/sec
-		log.Printf("%v find %v paths", meter, count)
+	var count, total int
+	if false {
+		count, total = sumAllSourcesShortestPathsV1(word, pair, component)
+		if timing {
+			meter.SetWork(float64(count)) // paths/sec
+			log.Printf("%v find %v paths", meter, count)
+		}
+		fmt.Printf("%12d word pairs\n", count)
+		fmt.Printf("%12d summed lengths of one shortest path per pair\n", total)
 	}
-	fmt.Printf("%12d word pairs\n", count)
-	fmt.Printf("%12d summed lengths of one shortest path per pair\n", total)
+
+	// count one shortest length path between each word pair in each component
+	if true {
+		count, total = sumAllSourcesShortestPathsV2(word, pair, component)
+		if timing {
+			meter.SetWork(float64(count)) // paths/sec
+			log.Printf("%v find %v paths", meter, count)
+		}
+		fmt.Printf("%12d word pairs\n", count)
+		fmt.Printf("%12d summed lengths of one shortest path per pair\n", total)
+	}
 
 	elapsed := float64(time.Now().Sub(start)) / 1e9
 	if verbose >= 1 {
@@ -436,14 +450,85 @@ func findComponents(word []string, pair []Indexes) Components {
 	return component
 }
 
+func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Component) (int, int) {
+	var totalPairs, totalPaths int
+	if len(component) > 0 {
+		d := make([]Index, len(word))              // shortest distance to every node
+		m := make([]uint8, len(word))              // node mode: undiscovered or processed
+		q := make([]Index, len(component[0].word)) // queue of discovered nodes
+		// note: special cases for 1 and 2 words are optional speedups
+		for _, c := range component {
+			switch {
+			case c.words == 1:
+			case c.words == 2:
+				totalPairs += 2
+				totalPaths += 2
+			default:
+				totalPairs += c.words * (c.words - 1)
+				for _, w := range c.word {
+					totalPaths += ssspBFS(c.word, pair, Index(w), d, q, m)
+				}
+			}
+		}
+	}
+	return totalPairs, totalPaths
+}
+
+// Compute Single Source Shortest Paths (SSSP) between a single source node and all
+// other nodes of the connected component. Return distance array in d and the sum
+// of the lengths of the shortest paths. Uses simple Breadth First Search which is
+// an optimal foundation for SSSP/ASSP in unweighted adjacency-list graphs. BFS is
+// friendly to parallelism since is has no impediment to concurrent evaluation.
+func ssspBFS(word []Index, pair []Indexes, w Index, d, queue []Index, mode []uint8) int {
+	for _, wn := range word {
+		d[wn] = INFINITY        // not known to be rechable (only set distances in component)
+		mode[wn] = Undiscovered // not yet been discovered
+	}
+	d[w] = 0
+	mode[w] = Processed
+
+	// push starting word onto queue
+	var head, tail int
+	queue[tail] = w
+	tail++
+
+	// breadth first traversal of graph rooted at w
+	total := 0
+	for distance := Index(1); head < tail; distance++ { // while queue is not empty
+		last := tail
+		for head < last { // for all nodes at this same distance
+			n := queue[head]
+			head++
+			for _, wn := range pair[n] {
+				if mode[wn] == Undiscovered {
+					d[wn] = distance
+					total += int(distance) // build sum incrementally
+					mode[wn] = Processed
+					queue[tail] = wn
+					tail++
+				}
+			}
+		}
+		head = last
+	}
+	return total
+}
+
 // ideally the breakpoint would be determined by a test
 const BREAKPOINT = 32 // switch from internal to external parallelism
 
-func sumAllSourcesShortestPaths(word []string, pair []Indexes, component []Component) (int, int) {
+func sumAllSourcesShortestPathsV2(word []string, pair []Indexes, component []Component) (int, int) {
 	var i, j, totalPairs, totalPaths int
 	components := len(component)
 
-	// PHASE 1 -- solve large problems sequentially, using parallel workers for each
+	// optimization -- skip parallel framework overhead when nothing but simple tasks
+	if true {
+		if components > 0 && component[0].words <= 16 {
+			return sumAllSourcesShortestPathsV1(word, pair, component)
+		}
+	}
+
+	// PHASE 1 -- solve large problems sequentially, using parallel workers fo each
 	for ; i < components && component[i].words >= BREAKPOINT; i++ {
 		c := component[i]
 		totalPairs += c.words * (c.words - 1)
@@ -561,7 +646,7 @@ func ssspWordsParallel(word []string, pair []Indexes, c Component) int {
 	return total
 }
 
-func ssspWordsSerial(word []string, pair []Indexes, c Component, d Indexes, q Indexes, m []uint8) int {
+func ssspWordsSerial(word []string, pair []Indexes, c Component, d, q []Index, m []uint8) int {
 	total := 0
 	for _, w := range c.word {
 		total += ssspBFS(c.word, pair, w, d, q, m)
@@ -574,46 +659,6 @@ const (
 	// Discovered
 	Processed
 )
-
-// Compute the Single Source Shortest Paths between one single source node and all
-// other nodes in the connected component. Return distance array in d and the sum
-// of the lengths of the shortest paths. Uses simple Breadth First Search which is
-// an optimal foundation for SSSP/ASSP in unweighted adjacency-list graphs. BFS is
-// friendly to parallelism since is has no impediment to concurrent evaluation.
-func ssspBFS(word Indexes, pair []Indexes, w Index, d Indexes, queue Indexes, mode []uint8) int {
-	for _, wn := range word {
-		d[wn] = INFINITY        // not known to be rechable (only set distances in component)
-		mode[wn] = Undiscovered // not yet been discovered
-	}
-	d[w] = 0
-	mode[w] = Processed
-
-	// push starting word onto queue
-	var head, tail int
-	queue[tail] = w
-	tail++
-
-	// breadth first traversal of graph rooted at w
-	total := 0
-	for distance := Index(1); head < tail; distance++ { // while queue is not empty
-		last := tail
-		for head < last { // for all nodes at this same distance
-			n := queue[head]
-			head++
-			for _, wn := range pair[n] {
-				if mode[wn] == Undiscovered {
-					d[wn] = distance
-					total += int(distance) // build sum incrementally
-					mode[wn] = Processed
-					queue[tail] = wn
-					tail++
-				}
-			}
-		}
-		head = last
-	}
-	return total
-}
 
 //
 // utility functions
@@ -718,6 +763,17 @@ func NewMeter() *Meter {
 	return m
 }
 
+func ProcessTimes() (user, system float64, size uint64) {
+	var usage syscall.Rusage
+	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &usage); err != nil {
+		fmt.Printf("Error: unable to gather resource usage data: %v\n", err)
+	}
+	user = float64(usage.Utime.Sec) + float64(usage.Utime.Usec)/1e6
+	system = float64(usage.Stime.Sec) + float64(usage.Stime.Usec)/1e6
+	size = uint64(uint32(usage.Maxrss))
+	return
+}
+
 func (m *Meter) SetWork(work float64) {
 	m.work = work
 }
@@ -750,15 +806,4 @@ func (m *Meter) String() string {
 	m.dMemory = dMemory
 
 	return s
-}
-
-func ProcessTimes() (user, system float64, size uint64) {
-	var usage syscall.Rusage
-	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &usage); err != nil {
-		fmt.Printf("Error: unable to gather resource usage data: %v\n", err)
-	}
-	user = float64(usage.Utime.Sec) + float64(usage.Utime.Usec)/1e6
-	system = float64(usage.Stime.Sec) + float64(usage.Stime.Usec)/1e6
-	size = uint64(uint32(usage.Maxrss))
-	return
 }
