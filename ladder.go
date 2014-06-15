@@ -15,6 +15,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -63,7 +64,7 @@ func main() {
 		filenames = []string{"/usr/share/dict/words"}
 	}
 
-	word := readWords(filenames, wordsize)
+	word := readWordsV1(filenames, wordsize)
 	if timing {
 		meter.SetWork(float64(len(word))) // unique words/sec
 		log.Printf("%v read %v words", meter, len(word))
@@ -131,7 +132,7 @@ func main() {
 }
 
 // Read words from files and return a clean, ordered word list
-func readWords(name []string, length int) []string {
+func readWordsV1(name []string, length int) []string {
 	// interpret word length parameter
 	var minLength, maxLength int
 	switch {
@@ -171,13 +172,14 @@ func readWords(name []string, length int) []string {
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
-		scanner.Split(bufio.ScanWords)
+		// scanner.Split(bufio.ScanWords)
+		scanner.Split(scanLetters)
 		for scanner.Scan() {
 			word := scanner.Text()
 			wordsRead++
 
 			if true { // sanitize (half-hearted job does not look inside strings)
-				word = strings.Trim(word, " \t0123456789.,?;:'\"[]{}=+~!@#$%^&*()\\|-")
+				// word = strings.Trim(word, " \t0123456789.,?;:'\"[]{}=+~!@#$%^&*()\\|-")
 				word = strings.ToLower(word)
 			}
 
@@ -227,6 +229,38 @@ func readWords(name []string, length int) []string {
 	return word
 }
 
+// scanLetters is a version of strings.ScanWords to make a split function for a Scanner
+// that returns each non-letter -separated string of text, with surrounding non-letter
+// characters deleted. It will never return an empty string.
+func scanLetters(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// Skip leading spaces.
+	start := 0
+	for width := 0; start < len(data); start += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[start:])
+		if unicode.IsLetter(r) {
+			break
+		}
+	}
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+	// Scan until space, marking end of word.
+	for width, i := 0, start; i < len(data); i += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[i:])
+		if !unicode.IsLetter(r) {
+			return i + width, data[start:i], nil
+		}
+	}
+	// If we're at EOF, we have a final, non-empty, non-terminated word. Return it.
+	if atEOF && len(data) > start {
+		return len(data), data[start:], nil
+	}
+	// Request more data.
+	return 0, nil, nil
+}
+
 func findPairs(word []string) []Indexes {
 	widest := widestString(word)
 	if widest > WIDEST {
@@ -238,17 +272,22 @@ func findPairs(word []string) []Indexes {
 	link := make(map[[WIDEST]rune]int, 128)
 	for _, w := range word {
 		var key [WIDEST]rune
-		for i, c := range w {
-			key[i] = c
+		j := 0
+		for _, r := range w {
+			// fmt.Printf("%v: %v %v %q\n", utf8.RuneCountInString(w), i, r, w)
+			key[j] = r
+			j++
 		}
-		for i := range w {
-			t := key[i]
-			key[i] = '?'
+		j = 0
+		for _ = range w {
+			t := key[j]
+			key[j] = '?'
 			if _, found := link[key]; !found {
 				link[key] = links
 				links++
 			}
-			key[i] = t
+			key[j] = t
+			j++
 		}
 	}
 	if verbose >= 2 {
@@ -274,15 +313,19 @@ func findPairs(word []string) []Indexes {
 	list := make([]Indexes, links)
 	for wn, w := range word {
 		var key [WIDEST]rune
-		for i, c := range w {
-			key[i] = c
+		j := 0
+		for _, c := range w {
+			key[j] = c
+			j++
 		}
-		for i := range w {
-			t := key[i]
-			key[i] = '?'
-			j := link[key]
-			list[j] = append(list[j], Index(wn))
-			key[i] = t
+		j = 0
+		for _ = range w {
+			t := key[j]
+			key[j] = '?'
+			k := link[key]
+			list[k] = append(list[k], Index(wn))
+			key[j] = t
+			j++
 		}
 	}
 
@@ -290,19 +333,23 @@ func findPairs(word []string) []Indexes {
 	pair := make([]Indexes, len(word))
 	for wn, w := range word {
 		var key [WIDEST]rune
-		for i, c := range w {
-			key[i] = c
+		j := 0
+		for _, c := range w {
+			key[j] = c
+			j++
 		}
-		for i := range w {
-			t := key[i]
-			key[i] = '?'
-			j := link[key]
-			for _, k := range list[j] {
-				if k != Index(wn) { // do not include self in list
-					pair[wn] = append(pair[wn], k)
+		j = 0
+		for _ = range w {
+			t := key[j]
+			key[j] = '?'
+			k := link[key]
+			for _, l := range list[k] {
+				if l != Index(wn) { // do not include self in list
+					pair[wn] = append(pair[wn], l)
 				}
 			}
-			key[i] = t
+			key[j] = t
+			j++
 		}
 		sort.Sort(pair[wn]) // keep ordered by word number (optional)
 	}
@@ -453,9 +500,9 @@ func findComponents(word []string, pair []Indexes) Components {
 func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Component) (int, int) {
 	var totalPairs, totalPaths int
 	if len(component) > 0 {
-		d := make([]Index, len(word))              // shortest distance to every node
-		m := make([]uint8, len(word))              // node mode: undiscovered or processed
-		q := make([]Index, len(component[0].word)) // queue of discovered nodes
+		distance := make([]Index, len(word))           // shortest distance to every node
+		queue := make([]Index, len(component[0].word)) // queue of newly processed fringe nodes
+		done := make([]bool, len(word))                // state: has node been processed?
 		// note: special cases for 1 and 2 words are optional speedups
 		for _, c := range component {
 			switch {
@@ -466,7 +513,7 @@ func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Com
 			default:
 				totalPairs += c.words * (c.words - 1)
 				for _, w := range c.word {
-					totalPaths += ssspBFS(c.word, pair, Index(w), d, q, m)
+					totalPaths += ssspBFS(c.word, pair, Index(w), distance, queue, done)
 				}
 			}
 		}
@@ -479,13 +526,13 @@ func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Com
 // of the lengths of the shortest paths. Uses simple Breadth First Search which is
 // an optimal foundation for SSSP/ASSP in unweighted adjacency-list graphs. BFS is
 // friendly to parallelism since is has no impediment to concurrent evaluation.
-func ssspBFS(word []Index, pair []Indexes, w Index, d, queue []Index, mode []uint8) int {
+func ssspBFS(word []Index, pair []Indexes, w Index, distance, queue []Index, done []bool) int {
 	for _, wn := range word {
-		d[wn] = INFINITY        // not known to be rechable (only set distances in component)
-		mode[wn] = Undiscovered // not yet been discovered
+		distance[wn] = INFINITY // not known to be rechable (word can be all or component)
+		done[wn] = false        // not yet discovered and processed by traversal
 	}
-	d[w] = 0
-	mode[w] = Processed
+	distance[w] = 0
+	done[w] = true
 
 	// push starting word onto queue
 	var head, tail int
@@ -494,22 +541,19 @@ func ssspBFS(word []Index, pair []Indexes, w Index, d, queue []Index, mode []uin
 
 	// breadth first traversal of graph rooted at w
 	total := 0
-	for distance := Index(1); head < tail; distance++ { // while queue is not empty
-		last := tail
-		for head < last { // for all nodes at this same distance
-			n := queue[head]
-			head++
-			for _, wn := range pair[n] {
-				if mode[wn] == Undiscovered {
-					d[wn] = distance
-					total += int(distance) // build sum incrementally
-					mode[wn] = Processed
-					queue[tail] = wn
-					tail++
-				}
+	for head < tail { // while queue is not empty
+		n := queue[head]
+		head++
+		d := distance[n] + 1
+		for _, wn := range pair[n] {
+			if !done[wn] {
+				done[wn] = true
+				distance[wn] = d
+				queue[tail] = wn
+				tail++
+				total += int(d)
 			}
 		}
-		head = last
 	}
 	return total
 }
@@ -569,17 +613,18 @@ func ssspComponentsParallel(word []string, pair []Indexes, component []Component
 	workers := MaxProcs
 	for k := 0; k < workers; k++ {
 		go func(id int, in chan Component, out chan int, word []string, pair []Indexes) {
-			d := make(Indexes, len(word))
-			m := make([]uint8, len(word))
-			var q Indexes
+			distance := make(Indexes, len(word))
+			done := make([]bool, len(word))
+			var queue Indexes
 
 			for c := range in {
-				if cap(q) < c.words {
-					q = make(Indexes, c.words) // should happen once in each worker
+				if cap(queue) < c.words {
+					queue = make(Indexes, c.words) // should happen once in each worker
 				} else {
-					q = q[:c.words]
+					queue = queue[:c.words]
 				}
-				out <- ssspWordsSerial(word, pair, c, d, q, m)
+
+				out <- ssspWordsSerial(word, pair, c, distance, queue, done)
 			}
 		}(k, tasks, results, word, pair)
 	}
@@ -613,9 +658,9 @@ func ssspWordsParallel(word []string, pair []Indexes, c Component) int {
 	workers := minInt(c.words, MaxProcs)
 	for i := 0; i < workers; i++ {
 		go func(id int, in chan Index, out chan int, word []string, pair []Indexes, c Component) {
-			d := make(Indexes, len(word))
-			mode := make([]uint8, len(word))
+			distance := make(Indexes, len(word))
 			queue := make(Indexes, len(c.word))
+			done := make([]bool, len(word))
 			for w := range in {
 
 				// if cap(queue) < c.words {
@@ -624,7 +669,7 @@ func ssspWordsParallel(word []string, pair []Indexes, c Component) int {
 				// 	queue = queue[:c.words]
 				// }
 
-				out <- ssspBFS(c.word, pair, Index(w), d, queue, mode)
+				out <- ssspBFS(c.word, pair, Index(w), distance, queue, done)
 			}
 		}(i, tasks, results, word, pair, c)
 	}
@@ -646,19 +691,13 @@ func ssspWordsParallel(word []string, pair []Indexes, c Component) int {
 	return total
 }
 
-func ssspWordsSerial(word []string, pair []Indexes, c Component, d, q []Index, m []uint8) int {
+func ssspWordsSerial(word []string, pair []Indexes, c Component, distance, queue []Index, done []bool) int {
 	total := 0
 	for _, w := range c.word {
-		total += ssspBFS(c.word, pair, w, d, q, m)
+		total += ssspBFS(c.word, pair, w, distance, queue, done)
 	}
 	return total
 }
-
-const (
-	Undiscovered = iota
-	// Discovered
-	Processed
-)
 
 //
 // utility functions
