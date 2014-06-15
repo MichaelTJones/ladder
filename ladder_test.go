@@ -389,15 +389,15 @@ func benchmarkSumLinearV1(b *testing.B, n int) {
 	}
 }
 
-func BenchmarkSumLinearV1_1000(b *testing.B) { benchmarkSumLinearV1(b, 1000) }
-func BenchmarkSumLinearV1_2000(b *testing.B) { benchmarkSumLinearV1(b, 2000) }
-func BenchmarkSumLinearV1_3000(b *testing.B) { benchmarkSumLinearV1(b, 3000) }
-func BenchmarkSumLinearV1_4000(b *testing.B) { benchmarkSumLinearV1(b, 4000) }
-func BenchmarkSumLinearV1_5000(b *testing.B) { benchmarkSumLinearV1(b, 5000) }
-func BenchmarkSumLinearV1_6000(b *testing.B) { benchmarkSumLinearV1(b, 6000) }
-func BenchmarkSumLinearV1_7000(b *testing.B) { benchmarkSumLinearV1(b, 7000) }
-func BenchmarkSumLinearV1_8000(b *testing.B) { benchmarkSumLinearV1(b, 8000) }
-func BenchmarkSumLinearV1_9000(b *testing.B) { benchmarkSumLinearV1(b, 9000) }
+func BenchmarkSumLinearV1_2000(b *testing.B)  { benchmarkSumLinearV1(b, 2000) }
+func BenchmarkSumLinearV1_4000(b *testing.B)  { benchmarkSumLinearV1(b, 4000) }
+func BenchmarkSumLinearV1_6000(b *testing.B)  { benchmarkSumLinearV1(b, 6000) }
+func BenchmarkSumLinearV1_8000(b *testing.B)  { benchmarkSumLinearV1(b, 8000) }
+func BenchmarkSumLinearV1_10000(b *testing.B) { benchmarkSumLinearV1(b, 10000) }
+func BenchmarkSumLinearV1_12000(b *testing.B) { benchmarkSumLinearV1(b, 12000) }
+func BenchmarkSumLinearV1_14000(b *testing.B) { benchmarkSumLinearV1(b, 14000) }
+func BenchmarkSumLinearV1_16000(b *testing.B) { benchmarkSumLinearV1(b, 16000) }
+func BenchmarkSumLinearV1_18000(b *testing.B) { benchmarkSumLinearV1(b, 18000) }
 
 func benchmarkSumLinearV2(b *testing.B, n int) {
 	node, edge, component := buildLinearGraph(n)
@@ -408,15 +408,15 @@ func benchmarkSumLinearV2(b *testing.B, n int) {
 	}
 }
 
-func BenchmarkSumLinearV2_1000(b *testing.B) { benchmarkSumLinearV2(b, 1000) }
-func BenchmarkSumLinearV2_2000(b *testing.B) { benchmarkSumLinearV2(b, 2000) }
-func BenchmarkSumLinearV2_3000(b *testing.B) { benchmarkSumLinearV2(b, 3000) }
-func BenchmarkSumLinearV2_4000(b *testing.B) { benchmarkSumLinearV2(b, 4000) }
-func BenchmarkSumLinearV2_5000(b *testing.B) { benchmarkSumLinearV2(b, 5000) }
-func BenchmarkSumLinearV2_6000(b *testing.B) { benchmarkSumLinearV2(b, 6000) }
-func BenchmarkSumLinearV2_7000(b *testing.B) { benchmarkSumLinearV2(b, 7000) }
-func BenchmarkSumLinearV2_8000(b *testing.B) { benchmarkSumLinearV2(b, 8000) }
-func BenchmarkSumLinearV2_9000(b *testing.B) { benchmarkSumLinearV2(b, 9000) }
+func BenchmarkSumLinearV2_2000(b *testing.B)  { benchmarkSumLinearV2(b, 2000) }
+func BenchmarkSumLinearV2_4000(b *testing.B)  { benchmarkSumLinearV2(b, 4000) }
+func BenchmarkSumLinearV2_6000(b *testing.B)  { benchmarkSumLinearV2(b, 6000) }
+func BenchmarkSumLinearV2_8000(b *testing.B)  { benchmarkSumLinearV2(b, 8000) }
+func BenchmarkSumLinearV2_10000(b *testing.B) { benchmarkSumLinearV2(b, 10000) }
+func BenchmarkSumLinearV2_12000(b *testing.B) { benchmarkSumLinearV2(b, 12000) }
+func BenchmarkSumLinearV2_14000(b *testing.B) { benchmarkSumLinearV2(b, 14000) }
+func BenchmarkSumLinearV2_16000(b *testing.B) { benchmarkSumLinearV2(b, 16000) }
+func BenchmarkSumLinearV2_18000(b *testing.B) { benchmarkSumLinearV2(b, 18000) }
 
 func benchmarkSumFullyConnectedV1(b *testing.B, n int) {
 	node, edge, component := buildFullyConnectedGraph(n)
