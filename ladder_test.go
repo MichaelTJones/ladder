@@ -156,7 +156,7 @@ func buildLatticeGraph(rows, cols int) ([]string, []Indexes, []Component) {
 	node := make([]string, n)
 	// for r := 0; r < rows; r++ {
 	// 	for c := 0; c < cols; c++ {
-	// 		node[row*cols+col] = fmt.Sprintf("n[%d][%d]", row, col)
+	// 		node[r*cols+c] = fmt.Sprintf("n[%d][%d]", r, c)
 	// 	}
 	// }
 
@@ -379,3 +379,123 @@ func BenchmarkSumASSPV2_webster9(b *testing.B) { benchmarkSumASSPV2(b, "words/we
 // func BenchmarkSumASSPV2_webster18(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-18", 18) }
 // func BenchmarkSumASSPV2_webster19(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-19", 19) }
 // func BenchmarkSumASSPV2_webster20(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-20", 20) }
+
+func benchmarkSumLinearV1(b *testing.B, n int) {
+	node, edge, component := buildLinearGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, edge, component)
+	}
+}
+
+func BenchmarkSumLinearV1_1000(b *testing.B) { benchmarkSumLinearV1(b, 1000) }
+func BenchmarkSumLinearV1_2000(b *testing.B) { benchmarkSumLinearV1(b, 2000) }
+func BenchmarkSumLinearV1_3000(b *testing.B) { benchmarkSumLinearV1(b, 3000) }
+func BenchmarkSumLinearV1_4000(b *testing.B) { benchmarkSumLinearV1(b, 4000) }
+func BenchmarkSumLinearV1_5000(b *testing.B) { benchmarkSumLinearV1(b, 5000) }
+func BenchmarkSumLinearV1_6000(b *testing.B) { benchmarkSumLinearV1(b, 6000) }
+func BenchmarkSumLinearV1_7000(b *testing.B) { benchmarkSumLinearV1(b, 7000) }
+func BenchmarkSumLinearV1_8000(b *testing.B) { benchmarkSumLinearV1(b, 8000) }
+func BenchmarkSumLinearV1_9000(b *testing.B) { benchmarkSumLinearV1(b, 9000) }
+
+func benchmarkSumLinearV2(b *testing.B, n int) {
+	node, edge, component := buildLinearGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, edge, component)
+	}
+}
+
+func BenchmarkSumLinearV2_1000(b *testing.B) { benchmarkSumLinearV2(b, 1000) }
+func BenchmarkSumLinearV2_2000(b *testing.B) { benchmarkSumLinearV2(b, 2000) }
+func BenchmarkSumLinearV2_3000(b *testing.B) { benchmarkSumLinearV2(b, 3000) }
+func BenchmarkSumLinearV2_4000(b *testing.B) { benchmarkSumLinearV2(b, 4000) }
+func BenchmarkSumLinearV2_5000(b *testing.B) { benchmarkSumLinearV2(b, 5000) }
+func BenchmarkSumLinearV2_6000(b *testing.B) { benchmarkSumLinearV2(b, 6000) }
+func BenchmarkSumLinearV2_7000(b *testing.B) { benchmarkSumLinearV2(b, 7000) }
+func BenchmarkSumLinearV2_8000(b *testing.B) { benchmarkSumLinearV2(b, 8000) }
+func BenchmarkSumLinearV2_9000(b *testing.B) { benchmarkSumLinearV2(b, 9000) }
+
+func benchmarkSumFullyConnectedV1(b *testing.B, n int) {
+	node, edge, component := buildFullyConnectedGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, edge, component)
+	}
+}
+
+func BenchmarkSumFullyConnectedV1_100(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 100) }
+func BenchmarkSumFullyConnectedV1_200(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 200) }
+func BenchmarkSumFullyConnectedV1_300(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 300) }
+func BenchmarkSumFullyConnectedV1_400(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 400) }
+func BenchmarkSumFullyConnectedV1_500(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 500) }
+func BenchmarkSumFullyConnectedV1_600(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 600) }
+func BenchmarkSumFullyConnectedV1_700(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 700) }
+func BenchmarkSumFullyConnectedV1_800(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 800) }
+func BenchmarkSumFullyConnectedV1_900(b *testing.B)  { benchmarkSumFullyConnectedV1(b, 900) }
+func BenchmarkSumFullyConnectedV1_1000(b *testing.B) { benchmarkSumFullyConnectedV1(b, 1000) }
+func BenchmarkSumFullyConnectedV1_1100(b *testing.B) { benchmarkSumFullyConnectedV1(b, 1100) }
+
+func benchmarkSumFullyConnectedV2(b *testing.B, n int) {
+	node, edge, component := buildFullyConnectedGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, edge, component)
+	}
+}
+
+func BenchmarkSumFullyConnectedV2_100(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 100) }
+func BenchmarkSumFullyConnectedV2_200(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 200) }
+func BenchmarkSumFullyConnectedV2_300(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 300) }
+func BenchmarkSumFullyConnectedV2_400(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 400) }
+func BenchmarkSumFullyConnectedV2_500(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 500) }
+func BenchmarkSumFullyConnectedV2_600(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 600) }
+func BenchmarkSumFullyConnectedV2_700(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 700) }
+func BenchmarkSumFullyConnectedV2_800(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 800) }
+func BenchmarkSumFullyConnectedV2_900(b *testing.B)  { benchmarkSumFullyConnectedV2(b, 900) }
+func BenchmarkSumFullyConnectedV2_1000(b *testing.B) { benchmarkSumFullyConnectedV2(b, 1000) }
+func BenchmarkSumFullyConnectedV2_1100(b *testing.B) { benchmarkSumFullyConnectedV2(b, 1100) }
+
+func benchmarkSumLatticeV1(b *testing.B, n int) {
+	node, edge, component := buildLatticeGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, edge, component)
+	}
+}
+
+func BenchmarkSumLatticeV1_10(b *testing.B)  { benchmarkSumLatticeV1(b, 10) }
+func BenchmarkSumLatticeV1_20(b *testing.B)  { benchmarkSumLatticeV1(b, 20) }
+func BenchmarkSumLatticeV1_30(b *testing.B)  { benchmarkSumLatticeV1(b, 30) }
+func BenchmarkSumLatticeV1_40(b *testing.B)  { benchmarkSumLatticeV1(b, 40) }
+func BenchmarkSumLatticeV1_50(b *testing.B)  { benchmarkSumLatticeV1(b, 50) }
+func BenchmarkSumLatticeV1_60(b *testing.B)  { benchmarkSumLatticeV1(b, 60) }
+func BenchmarkSumLatticeV1_70(b *testing.B)  { benchmarkSumLatticeV1(b, 70) }
+func BenchmarkSumLatticeV1_80(b *testing.B)  { benchmarkSumLatticeV1(b, 80) }
+func BenchmarkSumLatticeV1_90(b *testing.B)  { benchmarkSumLatticeV1(b, 90) }
+func BenchmarkSumLatticeV1_100(b *testing.B) { benchmarkSumLatticeV1(b, 100) }
+
+func benchmarkSumLatticeV2(b *testing.B, n int) {
+	node, edge, component := buildLatticeGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, edge, component)
+	}
+}
+
+func BenchmarkSumLatticeV2_10(b *testing.B)  { benchmarkSumLatticeV2(b, 10) }
+func BenchmarkSumLatticeV2_20(b *testing.B)  { benchmarkSumLatticeV2(b, 20) }
+func BenchmarkSumLatticeV2_30(b *testing.B)  { benchmarkSumLatticeV2(b, 30) }
+func BenchmarkSumLatticeV2_40(b *testing.B)  { benchmarkSumLatticeV2(b, 40) }
+func BenchmarkSumLatticeV2_50(b *testing.B)  { benchmarkSumLatticeV2(b, 50) }
+func BenchmarkSumLatticeV2_60(b *testing.B)  { benchmarkSumLatticeV2(b, 60) }
+func BenchmarkSumLatticeV2_70(b *testing.B)  { benchmarkSumLatticeV2(b, 70) }
+func BenchmarkSumLatticeV2_80(b *testing.B)  { benchmarkSumLatticeV2(b, 80) }
+func BenchmarkSumLatticeV2_90(b *testing.B)  { benchmarkSumLatticeV2(b, 90) }
+func BenchmarkSumLatticeV2_100(b *testing.B) { benchmarkSumLatticeV2(b, 100) }
