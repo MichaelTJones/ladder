@@ -15,7 +15,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"unicode"
 	"unicode/utf8"
 )
 
@@ -64,7 +63,7 @@ func main() {
 		filenames = []string{"/usr/share/dict/words"}
 	}
 
-	word := readWordsV1(filenames, wordsize)
+	word := readWords(filenames, wordsize)
 	if timing {
 		meter.SetWork(float64(len(word))) // unique words/sec
 		log.Printf("%v read %v words", meter, len(word))
@@ -132,7 +131,7 @@ func main() {
 }
 
 // Read words from files and return a clean, ordered word list
-func readWordsV1(name []string, length int) []string {
+func readWords(name []string, length int) []string {
 	// interpret word length parameter
 	var minLength, maxLength int
 	switch {
@@ -160,6 +159,11 @@ func readWordsV1(name []string, length int) []string {
 	unique := make(map[string]struct{})
 	var totalAdded, totalLong, totalRead int
 
+	// custom splitter for scanner using "all non-letters except apostrophe"
+	splitter := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		return scanCutset(data, atEOF, " \t0123456789.,?;:\"[]{}=+~!@#$%^&*()\\|-\n\r") // allow apostrophe
+	}
+
 	for _, n := range name {
 		var wordsAdded, wordsLong, wordsRead int
 
@@ -172,16 +176,11 @@ func readWordsV1(name []string, length int) []string {
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
-		// scanner.Split(bufio.ScanWords)
-		scanner.Split(scanLetters)
+		scanner.Split(splitter)
 		for scanner.Scan() {
 			word := scanner.Text()
-			wordsRead++
-
-			if true { // sanitize (half-hearted job does not look inside strings)
-				// word = strings.Trim(word, " \t0123456789.,?;:'\"[]{}=+~!@#$%^&*()\\|-")
-				word = strings.ToLower(word)
-			}
+			word = strings.Replace(word, "'", "", -1) // remove apostrophes ("o'clock" ==> "oclock")
+			word = strings.ToLower(word)
 
 			switch l := utf8.RuneCountInString(word); {
 			case minLength <= l && l <= maxLength:
@@ -190,6 +189,7 @@ func readWordsV1(name []string, length int) []string {
 			case l > WIDEST:
 				wordsLong++
 			}
+			wordsRead++
 		}
 		totalAdded += wordsAdded
 		totalLong += wordsLong
@@ -229,16 +229,18 @@ func readWordsV1(name []string, length int) []string {
 	return word
 }
 
-// scanLetters is a version of strings.ScanWords to make a split function for a Scanner
-// that returns each non-letter -separated string of text, with surrounding non-letter
-// characters deleted. It will never return an empty string.
-func scanLetters(data []byte, atEOF bool) (advance int, token []byte, err error) {
+// scanCutset is a version of strings.ScanWords that represents a split
+// function for a Scanner that returns each non-cutset-separated string
+// of text, with surrounding cutset characters deleted. It will never
+// return an empty string. It cannot be used directly with scanner, but
+// must be wrapped in another function to supply the cutset.
+func scanCutset(data []byte, atEOF bool, cutset string) (advance int, token []byte, err error) {
 	// Skip leading spaces.
 	start := 0
 	for width := 0; start < len(data); start += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[start:])
-		if unicode.IsLetter(r) {
+		if !strings.ContainsRune(cutset, r) {
 			break
 		}
 	}
@@ -249,7 +251,7 @@ func scanLetters(data []byte, atEOF bool) (advance int, token []byte, err error)
 	for width, i := 0, start; i < len(data); i += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[i:])
-		if !unicode.IsLetter(r) {
+		if strings.ContainsRune(cutset, r) {
 			return i + width, data[start:i], nil
 		}
 	}
@@ -528,7 +530,7 @@ func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Com
 // friendly to parallelism since is has no impediment to concurrent evaluation.
 func ssspBFS(word []Index, pair []Indexes, w Index, distance, queue []Index, done []bool) int {
 	for _, wn := range word {
-		distance[wn] = INFINITY // not known to be rechable (word can be all or component)
+		distance[wn] = INFINITY // not known to be rechable (can be graph or component)
 		done[wn] = false        // not yet discovered and processed by traversal
 	}
 	distance[w] = 0
