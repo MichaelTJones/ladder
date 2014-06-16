@@ -2,8 +2,6 @@ package main
 
 import "testing"
 
-// NOTE: the files mentioned below are 1 through 9 letter extracts from /usr/share/dict/words
-
 //
 // TESTS
 //
@@ -142,9 +140,8 @@ func TestFullyConnectedGraphsV2(t *testing.T) {
 	}
 }
 
-// build lattice graph
+// 3 x 4 lattice graph
 //
-//  3x4:
 //    O --- O --- O --- O
 //    |     |     |     |
 //    O --- O --- O --- O
@@ -210,7 +207,7 @@ func TestLatticeGraphsV1(t *testing.T) {
 	// test paths on square n x n lattices
 	for n := 2; n <= 40; n++ {
 		pair1 := (n * n) * (n*n - 1)
-		path1 := (2 * (n - 1) * n * n * n * (n + 1)) / 3
+		path1 := ((2 * n * n) * (n - 1) * n * (n + 1)) / 3 // this was tricky to derive
 
 		node, edge, component := buildLatticeGraph(n, n)
 		pair2, path2 := sumAllSourcesShortestPathsV1(node, edge, component)
@@ -225,7 +222,7 @@ func TestLatticeGraphsV2(t *testing.T) {
 	// test paths on square n x n lattices
 	for n := 2; n <= 40; n++ {
 		pair1 := (n * n) * (n*n - 1)
-		path1 := (2 * (n - 1) * n * n * n * (n + 1)) / 3
+		path1 := ((2 * n * n) * (n - 1) * n * (n + 1)) / 3 // this was tricky to derive
 
 		node, edge, component := buildLatticeGraph(n, n) // square n x n lattice
 		pair2, path2 := sumAllSourcesShortestPathsV2(node, edge, component)
@@ -239,6 +236,9 @@ func TestLatticeGraphsV2(t *testing.T) {
 //
 // BENCHMARKS
 //
+
+//   NOTE: Word iles mentioned below are 1 through 9 letter extracts from /usr/share/dict/words.
+//         They are also in the "words" subdirectory.
 
 func benchmarkReadWords(b *testing.B, f string, length int) {
 	slice := []string{f}
@@ -332,18 +332,6 @@ func BenchmarkSumASSPV1_webster7(b *testing.B) { benchmarkSumASSPV1(b, "words/we
 func BenchmarkSumASSPV1_webster8(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-8", 8) }
 func BenchmarkSumASSPV1_webster9(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-9", 9) }
 
-// func BenchmarkSumASSPV1_webster10(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-10", 10) }
-// func BenchmarkSumASSPV1_webster11(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-11", 11) }
-// func BenchmarkSumASSPV1_webster12(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-12", 12) }
-// func BenchmarkSumASSPV1_webster13(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-13", 13) }
-// func BenchmarkSumASSPV1_webster14(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-14", 14) }
-// func BenchmarkSumASSPV1_webster15(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-15", 15) }
-// func BenchmarkSumASSPV1_webster16(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-16", 16) }
-// func BenchmarkSumASSPV1_webster17(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-17", 17) }
-// func BenchmarkSumASSPV1_webster18(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-18", 18) }
-// func BenchmarkSumASSPV1_webster19(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-19", 19) }
-// func BenchmarkSumASSPV1_webster20(b *testing.B) { benchmarkSumASSPV1(b, "words/webster-20", 20) }
-
 func benchmarkSumASSPV2(b *testing.B, f string, length int) {
 	word := readWords([]string{f}, length)
 	if len(word) < 1 {
@@ -367,18 +355,6 @@ func BenchmarkSumASSPV2_webster6(b *testing.B) { benchmarkSumASSPV2(b, "words/we
 func BenchmarkSumASSPV2_webster7(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-7", 7) }
 func BenchmarkSumASSPV2_webster8(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-8", 8) }
 func BenchmarkSumASSPV2_webster9(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-9", 9) }
-
-// func BenchmarkSumASSPV2_webster10(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-10", 10) }
-// func BenchmarkSumASSPV2_webster11(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-11", 11) }
-// func BenchmarkSumASSPV2_webster12(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-12", 12) }
-// func BenchmarkSumASSPV2_webster13(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-13", 13) }
-// func BenchmarkSumASSPV2_webster14(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-14", 14) }
-// func BenchmarkSumASSPV2_webster15(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-15", 15) }
-// func BenchmarkSumASSPV2_webster16(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-16", 16) }
-// func BenchmarkSumASSPV2_webster17(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-17", 17) }
-// func BenchmarkSumASSPV2_webster18(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-18", 18) }
-// func BenchmarkSumASSPV2_webster19(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-19", 19) }
-// func BenchmarkSumASSPV2_webster20(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-20", 20) }
 
 func benchmarkSumLinearV1(b *testing.B, n int) {
 	node, edge, component := buildLinearGraph(n)
