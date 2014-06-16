@@ -161,7 +161,7 @@ func readWords(name []string, length int) []string {
 
 	// custom splitter for scanner using "all non-letters except apostrophe"
 	splitter := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-		return scanCutset(data, atEOF, " \t0123456789.,?;:\"[]{}=+~!@#$%^&*()\\|-\n\r") // allow apostrophe
+		return scanCutset(data, atEOF, " \t\n\r0123456789`~!@#$%^&*()-—_=+[{]}\\|;:\",<.>/?") // allow apostrophe
 	}
 
 	for _, n := range name {
@@ -180,6 +180,7 @@ func readWords(name []string, length int) []string {
 		for scanner.Scan() {
 			word := scanner.Text()
 			word = strings.Replace(word, "'", "", -1) // remove apostrophes ("o'clock" ==> "oclock")
+			word = strings.Replace(word, "’", "", -1) // remove apostrophes ("o'clock" ==> "oclock")
 			word = strings.ToLower(word)
 
 			switch l := utf8.RuneCountInString(word); {
@@ -394,68 +395,55 @@ func (c Components) Less(i, j int) bool {
 	return c[i].words > c[j].words || (c[i].words == c[j].words && c[i].word[0] < c[j].word[0])
 }
 
+// find connected components
 func findComponents(word []string, pair []Indexes) Components {
+	// every node has a corresponding component id
+	id := make([]Index, len(word))
+	for i := range id {
+		id[i] = INFINITY // means "not part of any component"
+	}
+	ids := Index(0)
+	queue := make([]Index, len(word)) // queue for BFS
+	m := make(Indexes, 0, len(word))
 	var component Components
-
-	// every node starts in the "active and ready to join" state
-	active := make([]bool, len(word))
-	for i := range active {
-		active[i] = true
-	}
-
-	// special cases for smallest (trivial) components (optional, but faster)
-	if true {
-		// find disconnected words as a special case
-		for wn, a := range active {
-			if a && len(pair[wn]) == 0 {
-				component = append(component,
-					Component{Indexes{Index(wn)}, 1})
-				active[wn] = false
-			}
-		}
-
-		// find disconnected two-word pairs as a special case
-		for wn1, a := range active {
-			if a && len(pair[wn1]) == 1 {
-				wn2 := pair[wn1][0]
-				if len(pair[wn2]) == 1 {
-					if word[wn1] < word[wn2] {
-						component = append(component,
-							Component{Indexes{Index(wn1), Index(wn2)}, 2})
-					}
-					active[wn1] = false
-					active[wn2] = false
-				}
-			}
-		}
-	}
-
-	// general case: find remaining connected components
-	last := make(Indexes, 0, 3*1024) // 11% faster when preallocated
-	this := make(Indexes, 0, 3*1024)
-	for wn, a := range active {
+	for w := range pair {
 		// find every active word reachable from this one
-		if a {
-			var reach Indexes // grow slowly as it will persist
-			reach = append(reach, Index(wn))
-			last = append(last, Index(wn))
-			active[wn] = false
-			for len(last) > 0 {
-				for _, l := range last {
-					for _, p := range pair[l] {
-						if active[p] {
-							reach = append(reach, p)
-							this = append(this, p)
-							active[p] = false
+		if id[w] == INFINITY {
+			switch {
+			case len(pair[w]) == 0: // disconnected word
+				id[w] = ids
+				m = append(m, Index(w))
+			case len(pair[w]) == 1 && len(pair[pair[w][0]]) == 1: // disconnected pair
+				w2 := pair[w][0]
+				id[w] = ids
+				id[w2] = ids
+				m = append(m, Index(w), Index(w2))
+			default:
+				var head, tail int
+				id[w] = ids            // id of current component
+				queue[tail] = Index(w) // push starting word onto queue
+				tail++
+				m = append(m, Index(w))
+
+				for head < tail { // breadth first traversal from w
+					n := queue[head]
+					head++
+					for _, wn := range pair[n] {
+						if id[wn] == INFINITY {
+							id[wn] = ids
+							queue[tail] = wn
+							tail++
+							m = append(m, wn)
 						}
 					}
 				}
-				last, this = this, last[:0]
+				sort.Sort(m) // order by word number
 			}
-			sort.Sort(reach) // keep ordered by word number (optional, 1/2 speed)
-			component = append(component, Component{reach, len(reach)})
-			last = last[:0]
-			this = this[:0]
+			members := make(Indexes, len(m))
+			copy(members, m)
+			component = append(component, Component{members, len(members)})
+			m = m[:0]
+			ids++
 		}
 	}
 	sort.Sort(component) // keep ordered by component size
@@ -477,6 +465,7 @@ func findComponents(word []string, pair []Indexes) Components {
 		}
 	}
 	if verbose >= 2 {
+		log.Printf("component list:\n")
 		for cn, c := range component {
 			switch {
 			case c.words < 13:
@@ -507,9 +496,9 @@ func sumAllSourcesShortestPathsV1(word []string, pair []Indexes, component []Com
 		done := make([]bool, len(word))                // state: has node been processed?
 		// note: special cases for 1 and 2 words are optional speedups
 		for _, c := range component {
-			switch {
-			case c.words == 1:
-			case c.words == 2:
+			switch c.words {
+			case 1:
+			case 2:
 				totalPairs += 2
 				totalPaths += 2
 			default:
