@@ -270,91 +270,37 @@ func findPairs(word []string) []Indexes {
 		log.Fatalf("constant 'WIDEST=%v' is too small, must be >= %v for chosen words", WIDEST, widest)
 	}
 
-	// create a map entry for unique "change one letter" word variants
-	links := 0
-	link := make(map[[WIDEST]rune]int, 128)
-	for _, w := range word {
-		var key [WIDEST]rune
-		j := 0
-		for _, r := range w {
-			// fmt.Printf("%v: %v %v %q\n", utf8.RuneCountInString(w), i, r, w)
-			key[j] = r
-			j++
-		}
-		j = 0
-		for _ = range w {
-			t := key[j]
-			key[j] = '?'
-			if _, found := link[key]; !found {
-				link[key] = links
-				links++
-			}
-			key[j] = t
-			j++
-		}
-	}
-	if verbose >= 2 {
-		log.Printf("%v links\n", len(link))
-	}
-	if verbose >= 3 {
-		fmt.Printf("links:\n")
-		ls := make([]string, len(link))
-		ln := 0
-		for l := range link {
-			r := WIDEST - 1
-			for r > 0 && l[r] == 0 {
-				r--
-			}
-			ls[ln] = string(l[:r+1])
-			ln++
-		}
-		sort.Strings(ls)
-		printWords(ls)
-	}
-
-	// create lists of linked words with a common index in link map
-	list := make([]Indexes, links)
+	// make a list of words sharing each "change one letter" word variation
+	link := make(map[[WIDEST]rune]Indexes, 5*len(word))
+	var key [WIDEST]rune
 	for wn, w := range word {
-		var key [WIDEST]rune
-		j := 0
-		for _, c := range w {
-			key[j] = c
-			j++
+		runes := []rune(w)
+		for i, r := range runes {
+			key[i] = r
 		}
-		j = 0
-		for _ = range w {
-			t := key[j]
-			key[j] = '?'
-			k := link[key]
-			list[k] = append(list[k], Index(wn))
-			key[j] = t
-			j++
+		for i, r := range runes {
+			key[i] = '?'
+			list := link[key]
+			link[key] = append(list, Index(wn))
+			key[i] = r
+		}
+		for i := range runes {
+			key[i] = 0
 		}
 	}
 
-	// create a customized list of linked words for each word
 	pair := make([]Indexes, len(word))
-	for wn, w := range word {
-		var key [WIDEST]rune
-		j := 0
-		for _, c := range w {
-			key[j] = c
-			j++
-		}
-		j = 0
-		for _ = range w {
-			t := key[j]
-			key[j] = '?'
-			k := link[key]
-			for _, l := range list[k] {
-				if l != Index(wn) { // do not include self in list
-					pair[wn] = append(pair[wn], l)
+	for _, list := range link {
+		for _, wn1 := range list {
+			for _, wn2 := range list {
+				if wn1 != wn2 {
+					pair[wn1] = append(pair[wn1], wn2)
 				}
 			}
-			key[j] = t
-			j++
 		}
-		sort.Sort(pair[wn]) // keep ordered by word number (optional)
+	}
+	for _, p := range pair {
+		sort.Sort(p) // keep ordered by word number
 	}
 
 	if verbose >= 1 {
@@ -380,6 +326,7 @@ func findPairs(word []string) []Indexes {
 		fmt.Println()
 	}
 	return pair
+
 }
 
 type Component struct {
