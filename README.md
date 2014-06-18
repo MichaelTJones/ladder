@@ -53,7 +53,8 @@ As it turns out, the tests were the most interesting part of this whole effort. 
 
 ((2 * n * n) * (n - 1) * n * (n + 1)) / 3
 
-there is a solution like this for a collection of simple graph types. When I finish I may send these in to OEIS.
+there is a solution like this in `lattice_test.go` for a growing collection of simple graph types. 
+When I finish I may send these in to OEIS.
 
 Benchmarks come in two varieties, V1 and V2. V1 are single-threaded while V2 use every processor allowed by GOMAXPROCS.
 
