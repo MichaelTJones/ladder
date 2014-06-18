@@ -18,7 +18,7 @@ import (
 	"unicode/utf8"
 )
 
-const WIDEST = 20
+const WIDEST = 12
 
 type Index uint32 // array index type for node and edge lists
 const INFINITY = 1 << 30
@@ -63,7 +63,7 @@ func main() {
 		filenames = []string{"/usr/share/dict/words"}
 	}
 
-	word := readWords(filenames, wordsize)
+	word, runes := readWords(filenames, wordsize)
 	if timing {
 		meter.SetWork(float64(len(word))) // unique words/sec
 		log.Printf("%v read %v words", meter, len(word))
@@ -79,7 +79,7 @@ func main() {
 
 	// Determine which word-to-word transformations are allowed by the rules
 	// of Lewis Carroll's Doublets puzzle. These are the graph's edges.
-	pair := findPairs(word)
+	pair := findPairs(word, runes)
 	if timing {
 		sum := 0
 		for _, p := range pair {
@@ -131,7 +131,7 @@ func main() {
 }
 
 // Read words from files and return a clean, ordered word list
-func readWords(name []string, length int) []string {
+func readWords(name []string, length int) ([]string, int) {
 	// interpret word length parameter
 	var minLength, maxLength int
 	switch {
@@ -164,6 +164,7 @@ func readWords(name []string, length int) []string {
 		return scanCutset(data, atEOF, " \t\n\r0123456789`~!@#$%^&*()-—_=+[{]}\\|;:\",<.>/?") // allow apostrophe
 	}
 
+	runesAdded := 0
 	for _, n := range name {
 		var wordsAdded, wordsLong, wordsRead int
 
@@ -187,6 +188,7 @@ func readWords(name []string, length int) []string {
 			case minLength <= l && l <= maxLength:
 				unique[word] = struct{}{}
 				wordsAdded++
+				runesAdded += l
 			case l > WIDEST:
 				wordsLong++
 			}
@@ -227,7 +229,7 @@ func readWords(name []string, length int) []string {
 		fmt.Printf("words:\n")
 		printWords(word)
 	}
-	return word
+	return word, runesAdded
 }
 
 // scanCutset is a version of strings.ScanWords that represents a split
@@ -264,14 +266,17 @@ func scanCutset(data []byte, atEOF bool, cutset string) (advance int, token []by
 	return 0, nil, nil
 }
 
-func findPairs(word []string) []Indexes {
+func findPairs(word []string, runes int) []Indexes {
 	widest := widestString(word)
 	if widest > WIDEST {
 		log.Fatalf("constant 'WIDEST=%v' is too small, must be >= %v for chosen words", WIDEST, widest)
 	}
 
 	// make a list of words sharing each "change one letter" word variation
-	link := make(map[[WIDEST]rune]Indexes, 5*len(word))
+	if runes < 1 {
+		runes = 3 * len(word)
+	}
+	link := make(map[[WIDEST]rune]Indexes, (10*runes+7)/8)
 	var key [WIDEST]rune
 	for wn, w := range word {
 		runes := []rune(w)
@@ -280,8 +285,7 @@ func findPairs(word []string) []Indexes {
 		}
 		for i, r := range runes {
 			key[i] = '?'
-			list := link[key]
-			link[key] = append(list, Index(wn))
+			link[key] = append(link[key], Index(wn))
 			key[i] = r
 		}
 		for i := range runes {
@@ -309,7 +313,8 @@ func findPairs(word []string) []Indexes {
 			total += len(v)
 		}
 		total /= 2 // undirected edges go both ways
-		log.Printf("found %d edge%s between words\n", total, plural(total))
+		density := float64(2*total) / float64(len(word)*(len(word)-1))
+		log.Printf("found %d edge%s between words (%.4f%% dense)\n", total, plural(total), 100*density)
 	}
 	if verbose >= 2 {
 		fmt.Printf("linked words:\n")
@@ -510,14 +515,14 @@ func sumAllSourcesShortestPathsV2(word []string, pair []Indexes, component []Com
 		}
 	}
 
-	// PHASE 1 -- solve large problems sequentially, using parallel workers fo each
+	// solve large problems sequentially, using parallel workers within each
 	for ; i < components && component[i].words >= BREAKPOINT; i++ {
 		c := component[i]
 		totalPairs += c.words * (c.words - 1)
 		totalPaths += ssspWordsParallel(word, pair, c)
 	}
 
-	// PHASE 2 -- solve medium problems in parallel, using a single worker for each
+	// solve medium problems in parallel, using a single worker for each
 	for j = i; j < components && component[j].words > 2; j++ {
 	}
 	if i < j {
@@ -527,16 +532,16 @@ func sumAllSourcesShortestPathsV2(word []string, pair []Indexes, component []Com
 		i = j
 	}
 
-	// PHASE 3 -- solve small (nodes <= 2) problems directly
+	// solve small (nodes <= 2) problems directly
 	for ; i < len(component); i++ {
 		c := component[i]
 		switch {
 		case c.words == 1: // single aloof word with no solutions
-		case c.words == 2: // single pair of words with two solutions (a->b and b->a) of length 1
+		case c.words == 2: // single pair of words with two length 1 solutions (a->b and b->a)
 			totalPairs += 2
 			totalPaths += 2
 		default:
-			log.Fatal("internal error: phase 3 problem with more than 2 nodes")
+			log.Fatal("internal error: small problem with more than 2 nodes")
 		}
 	}
 	return totalPairs, totalPaths
@@ -600,13 +605,6 @@ func ssspWordsParallel(word []string, pair []Indexes, c Component) int {
 			queue := make(Indexes, len(c.word))
 			done := make([]bool, len(word))
 			for w := range in {
-
-				// if cap(queue) < c.words {
-				// 	queue = make(Indexes, c.words)
-				// } else {
-				// 	queue = queue[:c.words]
-				// }
-
 				out <- ssspBFS(c.word, pair, Index(w), distance, queue, done)
 			}
 		}(i, tasks, results, word, pair, c)
