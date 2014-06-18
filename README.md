@@ -6,7 +6,7 @@ Efficient solution of the all pairs shortest paths probem in Go.
 At present the program is
 not configured to print or find solutions but rather to sum the length of the shortest path
 between every pair of connected words (nodes). This is a "fingerprint" of the APSP distance
-matrix and serves to show that multiple solutions are deriving the same underlying result.
+matrix and serves to show that alternative programs are deriving the same underlying result.
 
 The code here is associated with 
 the following golang-nuts discussion about approach, parallelism, efficiency, and timing.
