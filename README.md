@@ -1,8 +1,13 @@
 ladder
 ======
 
-Efficient solution of an all source shortest paths probem in Go. The code here is associated with 
-the following golang-nuts discussion about approach, parallelism, efficiency, timing, and so on.
+Efficient solution of the all sourcs shortest paths probem in Go. At present the program is
+not configured to print or find solutions but rather to sum the length of tha shortest path
+between every pair of connected words (nodes). This is a "fingerprint" of the ASSP distance
+matrix and serves to show that multiple solutions are deriving the same underlying result.
+
+The code here is associated with 
+the following golang-nuts discussion about approach, parallelism, efficiency, and timing.
 
 https://groups.google.com/forum/#!topic/golang-nuts/ScFRRxqHTkY
 
@@ -36,13 +41,19 @@ export GOMAXPROCS=8
 ./ladder -v 1
 ```
 
-Watch the resource usage graphs if you have that.
+Watch the resource usage graphs if you have tools to visuaize them.
 
 There are many tests and benchmarks. To test:
 
 ```
 go test -v
 ```
+
+As it turns out, the tests were the most interesting part of this whole effort. Since I could not find any references to "known analytic values of sum of ASSP for paramateratized graphs" then I had to choose some simple graphs and derive the analytic solutions by hand. It was not too difficult generally, but some were tricky. Most challenging was the 2D lattice or grid graph, where an m x n lattice of nodes represnts an (m-1) x (n-1) grid of cells, like graph paper. The shortest paths between any pair of nodes on such a grid is one problem, and then the sum of all such paths is the second task. For the case of n x n square lattices, the sum of the lengths of the shortest paths between every pair of nodes is:
+
+((2 * n * n) * (n - 1) * n * (n + 1)) / 3
+
+there is a solution like this for a collection of simple graph types. When I finish I may send these in to OEIS.
 
 Benchmarks come in two varieties, V1 and V2. V1 are single-threaded while V2 use every processor allowed by GOMAXPROCS.
 
