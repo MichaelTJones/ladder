@@ -1,9 +1,9 @@
 ladder
 ======
 
-Efficient solution of the all sourcs shortest paths probem in Go. At present the program is
+Efficient solution of the all pairs shortest paths probem in Go. At present the program is
 not configured to print or find solutions but rather to sum the length of tha shortest path
-between every pair of connected words (nodes). This is a "fingerprint" of the ASSP distance
+between every pair of connected words (nodes). This is a "fingerprint" of the APSP distance
 matrix and serves to show that multiple solutions are deriving the same underlying result.
 
 The code here is associated with 
