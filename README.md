@@ -6,7 +6,7 @@ the following golang-nuts discussion about approach, parallelism, efficiency, ti
 
 https://groups.google.com/forum/#!topic/golang-nuts/ScFRRxqHTkY
 
-The ladder program presumes `/usr/share/dict/words`, so you can use it in these ways:
+The ladder program presumes "/usr/share/dict/words" exists, or, you can specify any number of word files on the command line. You can use it in these ways:
 
 `go build`
 
@@ -19,26 +19,35 @@ _get detailed timing information_
 `./ladder -t -n 4`
 
 _get a variety of interesting facts by raising the verbosity level_
+
+
 ```
 ./ladder -v 1 -n 4
 ./ladder -v 2 -n 4
 ./ladder -v 3 -n 4
 ```
 
-To go fast and understand the parallelism approach, be sure to set GOMAXPROCS.
+To go fast and benefit from parallelism, be sure to set GOMAXPROCS.
 
 _use 4 cores and 4 SMT phantom CPUs to process all of /usr/share/dict/words_
+
 ```
 export GOMAXPROCS=8
 ./ladder -v 1
 ```
 
-Be sure to watch the resource usage graphs if you have that.
+Watch the resource usage graphs if you have that.
 
-There are benchmarks, but no tests (I've not been able to find any other data to test against that 
-says what the sum of lengths of all shortest paths is for some word set.) To test:
+There are many tests and benchmarks. To test:
+
+```
+go test -v
+```
+
+Benchmarks come in two varieties, V1 and V2. V1 are single-threaded while V2 use every processor allowed by GOMAXPROCS.
 
 _choose your parallelism level_
+
 ```
 export GOMAXPROCS=8
 go test -v -bench=.
@@ -54,7 +63,8 @@ but I also compare with -B mode to measure bounds checking cost
 
 You'll also want some sample word lists. The tests expect a subdirectory named words with files 
 named webster-1, webster-2, ..., webster-9 representing 1-9 character words abstracted from the 
-system word list stored (on my Mac) in `/usr/share/dict/words.`
+system word list stored (on my Mac) in `/usr/share/dict/words.` These files are here in the `words` 
+subdirectory.
 
 I was lazy when I built my files, using this bash script:
 ```
@@ -81,7 +91,8 @@ grep "^...................$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-19
 grep "^....................$" webster | tr "[A-Z]" "[a-z]" | sort -u > webster-20
 ```
 
-however, now that the program exists, it would be fine to do the following:
+however, now that the program exists, it would be fine to do the following to create these files:
+
 ```
 go build 
 mkdir words
@@ -91,6 +102,10 @@ mkdir words
 :
 ```
 
-...using whatever looping/shell structure makes sense to you.
+...using whatever looping/shell structure makes sense to you. Easier is to have the program reall all of /usr/share/dict/words and pull out just the n-letter words. This is simple. For 7-letter words:
 
-The files are there now.
+```
+./ladder -n 7
+```
+
+Note that the file reading code is carefully written so that it can extract words from arbitrary text, such as Project Gutenberg books (http://www.gutenberg.org/) and in any UTF-encoded files.
