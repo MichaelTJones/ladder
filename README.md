@@ -53,8 +53,7 @@ As it turns out, the tests were the most interesting part of this whole effort. 
 
 ((2 * n * n) * (n - 1) * n * (n + 1)) / 3
 
-there is a solution like this in `lattice_test.go` for a growing collection of simple graph types. 
-When I finish I may send these in to OEIS.
+there is a solution like this in `lattice_test.go` for a growing collection of simple graph types. (Update: Now that I did all this, I see that the Weiner Index is essentially half the value I was looking for, and that the analytic solutions were already available. Ref:  http://mathworld.wolfram.com/WienerIndex.html)
 
 Benchmarks come in two varieties, V1 and V2. V1 are single-threaded while V2 use every processor allowed by GOMAXPROCS.
 
