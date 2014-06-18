@@ -1,8 +1,10 @@
 ladder
 ======
 
-Efficient solution of the all pairs shortest paths probem in Go. (http://en.wikipedia.org/wiki/Shortest_path_problem) At present the program is
-not configured to print or find solutions but rather to sum the length of tha shortest path
+Efficient solution of the all pairs shortest paths probem in Go. 
+(http://en.wikipedia.org/wiki/Shortest_path_problem) 
+At present the program is
+not configured to print or find solutions but rather to sum the length of the shortest path
 between every pair of connected words (nodes). This is a "fingerprint" of the APSP distance
 matrix and serves to show that multiple solutions are deriving the same underlying result.
 
