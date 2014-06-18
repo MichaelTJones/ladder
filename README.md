@@ -114,10 +114,11 @@ mkdir words
 :
 ```
 
-...using whatever looping/shell structure makes sense to you. Easier is to have the program reall all of /usr/share/dict/words and pull out just the n-letter words. This is simple. For 7-letter words:
+...using whatever looping/shell structure makes sense to you. Easier is to have the program read all of /usr/share/dict/words and pull out only the n-letter words. This is specified with the `-n` option. 
+For 7-letter words:
 
 ```
 ./ladder -n 7
 ```
 
-Note that the file reading code is carefully written so that it can extract words from arbitrary text, such as Project Gutenberg books (http://www.gutenberg.org/) and in any UTF-encoded files.
+Note that the file reading code is carefully written so that it can extract words from arbitrary text, such as Project Gutenberg books (http://www.gutenberg.org/) and UTF-8 encoded files in languages like Greek and Chinese. Chinese, Japanese, and Korean are interesting in the context of Doublets because they have a much higher word-to-word edge density than languages like English and Latin. This density is reported when the verbosity is raised above 1. (try `-v 2`)
