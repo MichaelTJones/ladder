@@ -354,10 +354,12 @@ func findComponents(word []string, pair []Indexes) Components {
 	for i := range id {
 		id[i] = INFINITY // means "not part of any component"
 	}
+
 	ids := Index(0)
 	queue := make([]Index, len(word)) // queue for BFS
 	m := make(Indexes, 0, len(word))
 	var component Components
+
 	for w := range pair {
 		// find every active word reachable from this one
 		if id[w] == INFINITY {
@@ -502,7 +504,7 @@ func ssspBFS(word []Index, pair []Indexes, w Index, distance, queue []Index, don
 }
 
 // ideally the breakpoint would be determined by a test
-const BREAKPOINT = 32 // switch from internal to external parallelism
+const BREAKPOINT = 16 // switch from internal to external parallelism
 
 func sumAllSourcesShortestPathsV2(word []string, pair []Indexes, component []Component) (int, int) {
 	var i, j, totalPairs, totalPaths int
