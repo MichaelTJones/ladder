@@ -45,22 +45,28 @@ func buildPathGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-//              sum of
-//       pairs   paths   illustration
-//    1:     0       0   O
-//    2:     2       2   O --- O
-//    3:     6       8   O --- O --- O
-//    4:    12      20   O --- O --- O --- O
-//    5:    20      40   O --- O --- O --- O --- O
-//    6:    30      70   O --- O --- O --- O --- O --- O
-//    7:    42     112   O --- O --- O --- O --- O --- O --- O
-//                  :
-//  200: 39800 2666600
+// Path graph counts
+//
+//                sum of
+//      n  pairs   paths
+//      1:     0       0
+//      2:     2       2
+//      3:     6       8
+//      4:    12      20
+//      5:    20      40
+//      6:    30      70
+//      7:    42     112
+//      8:    56     168
+//             ⋮
+//    197: 38612 2548392
+//    198: 39006 2587398
+//    199: 39402 2626800
+//    200: 39800 2666600
 
 func TestPathGraphV1(t *testing.T) {
 	for n := 1; n <= 200; n++ {
 		pair1 := n * (n - 1)
-		path1 := ((n - 1) * n * (n + 1)) / 3 // sum of all pairs shortest path lengths
+		path1 := (n * (n*n - 1)) / 3 // sum of all pairs shortest path lengths
 
 		node, a, component := buildPathGraph(n)
 		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
@@ -74,7 +80,7 @@ func TestPathGraphV1(t *testing.T) {
 func TestPathGraphV2(t *testing.T) {
 	for n := 1; n <= 200; n++ {
 		pair1 := n * (n - 1)
-		path1 := ((n - 1) * n * (n + 1)) / 3 // sum of all pairs shortest path lengths
+		path1 := (n * (n*n - 1)) / 3 // sum of all pairs shortest path lengths
 
 		node, a, component := buildPathGraph(n)
 		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
@@ -148,6 +154,22 @@ func buildCycleGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
+// Cycle graph counts
+//
+//                sum of
+//      n  pairs   paths
+//      3:     6       6
+//      4:    12      16
+//      5:    20      30
+//      6:    30      54
+//      7:    42      84
+//      8:    56     128
+//             ⋮
+//    197: 38612 1911294
+//    198: 39006 1940598
+//    199: 39402 1970100
+//    200: 39800 2000000
+
 func TestCycleGraphV1(t *testing.T) {
 	for n := 3; n <= 200; n++ {
 		pair1 := n * (n - 1)
@@ -157,7 +179,7 @@ func TestCycleGraphV1(t *testing.T) {
 		case 0:
 			path1 = (n * n * n) / 4
 		case 1:
-			path1 = ((n - 1) * n * (n + 1)) / 4
+			path1 = (n * (n*n - 1)) / 4
 		}
 
 		node, a, component := buildCycleGraph(n)
@@ -178,7 +200,7 @@ func TestCycleGraphV2(t *testing.T) {
 		case 0:
 			path1 = (n * n * n) / 4
 		case 1:
-			path1 = ((n - 1) * n * (n + 1)) / 4
+			path1 = (n * (n*n - 1)) / 4
 		}
 
 		node, a, component := buildCycleGraph(n)
@@ -259,6 +281,24 @@ func buildCompleteGraph(n int) ([]string, []Indexes, []Component) {
 
 	return node, a, component
 }
+
+// Complete graph counts
+//
+//                sum of
+//      n  pairs   paths
+//      1:     0       0
+//      2:     2       2
+//      3:     6       6
+//      4:    12      12
+//      5:    20      20
+//      6:    30      30
+//      7:    42      42
+//      8:    56      56
+//             ⋮
+//     97:  9312    9312
+//     98:  9506    9506
+//     99:  9702    9702
+//    100:  9900    9900
 
 func TestCompleteGraphV1(t *testing.T) {
 	for n := 1; n <= 100; n++ {
@@ -360,6 +400,24 @@ func buildStarGraph(n int) ([]string, []Indexes, []Component) {
 
 	return node, a, component
 }
+
+// Star graph counts
+//
+//                sum of
+//      n  pairs   paths
+//      1:     0       0
+//      2:     2       2
+//      3:     6       8
+//      4:    12      18
+//      5:    20      32
+//      6:    30      50
+//      7:    42      72
+//      8:    56      98
+//             ⋮
+//    197: 38612   76832
+//    198: 39006   77618
+//    199: 39402   78408
+//    200: 39800   79202
 
 func TestStarGraphV1(t *testing.T) {
 	for n := 1; n <= 200; n++ {
@@ -464,6 +522,24 @@ func buildWheelGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
+// Wheel graph counts
+//
+//                sum of
+//      n  pairs   paths
+//      4:    12      12
+//      5:    20      24
+//      6:    30      40
+//      7:    42      60
+//      8:    56      84
+//      9:    72     112
+//     10:    90     144
+//     11:   110     180
+//             ⋮
+//    297: 87912  174640
+//    298: 88506  175824
+//    299: 89102  177012
+//    300: 89700  178204
+
 func TestWheelGraphV1(t *testing.T) {
 	for n := 4; n <= 300; n++ {
 		pair1 := n * (n - 1)
@@ -530,8 +606,8 @@ func BenchmarkSumWheelV2_14000(b *testing.B) { benchmarkSumWheelV2(b, 14000) }
 func BenchmarkSumWheelV2_16000(b *testing.B) { benchmarkSumWheelV2(b, 16000) }
 func BenchmarkSumWheelV2_18000(b *testing.B) { benchmarkSumWheelV2(b, 18000) }
 
-// Lattice graph (grid graph, square grid graph)
-// http://en.wikipedia.org/wiki/Lattice_graph#Square_grid_graph
+// 2DGrid graph (grid graph, square grid graph)
+// http://en.wikipedia.org/wiki/2DGrid_graph#Square_grid_graph
 //
 // 3 x 4 lattice graph
 //
@@ -541,32 +617,70 @@ func BenchmarkSumWheelV2_18000(b *testing.B) { benchmarkSumWheelV2(b, 18000) }
 //    |     |     |     |
 //    O --- O --- O --- O
 
-func buildLatticeGraph(rows, cols int) ([]string, []Indexes, []Component) {
-	n := rows * cols
+// func build2DGridGraph(rows, cols int) ([]string, []Indexes, []Component) {
+// 	n := rows * cols
+// 	node := make([]string, n)
+// 	// for r := 0; r < rows; r++ {
+// 	// 	for c := 0; c < cols; c++ {
+// 	// 		node[r*cols+c] = fmt.Sprintf("n[%d][%d]", r, c)
+// 	// 	}
+// 	// }
+
+// 	a := make([]Indexes, n)
+
+// 	for r := 0; r < rows; r++ {
+// 		for c := 0; c < cols; c++ {
+// 			i := r*cols + c
+
+// 			if r > 0 {
+// 				a[i] = append(a[i], Index((r-1)*cols+c)) // UP
+// 			}
+// 			if c > 0 {
+// 				a[i] = append(a[i], Index(i-1)) // LEFT: i-1 == r*cols+(c-1)
+// 			}
+// 			if c < cols-1 {
+// 				a[i] = append(a[i], Index(i+1)) // RIGHT: i+1 == r*cols+(c+1)
+// 			}
+// 			if r < rows-1 {
+// 				a[i] = append(a[i], Index((r+1)*cols+c)) // DOWN
+// 			}
+
+// 		}
+// 	}
+
+// 	member := make([]Index, n)
+// 	for i := range member {
+// 		member[i] = Index(i)
+// 	}
+// 	component := []Component{{member, n}}
+
+// 	return node, a, component
+// }
+
+func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
+	n := nx * ny
 	node := make([]string, n)
-	// for r := 0; r < rows; r++ {
-	// 	for c := 0; c < cols; c++ {
-	// 		node[r*cols+c] = fmt.Sprintf("n[%d][%d]", r, c)
+	// for x := 0; x < nx; x++ {
+	// 	for y := 0; y < ny; y++ {
+	// 		node[y*nx+x] = fmt.Sprintf("n[%d][%d]", x, y)
 	// 	}
 	// }
-
 	a := make([]Indexes, n)
 
-	for r := 0; r < rows; r++ {
-		for c := 0; c < cols; c++ {
-			i := r*cols + c
-
-			if r > 0 {
-				a[i] = append(a[i], Index((r-1)*cols+c)) // UP
+	for y := 0; y < ny; y++ {
+		for x := 0; x < nx; x++ {
+			i := y*nx + x
+			if x > 0 {
+				a[i] = append(a[i], Index(i-1)) // -X
 			}
-			if c > 0 {
-				a[i] = append(a[i], Index(i-1)) // LEFT: i-1 == r*cols+(c-1)
+			if x < nx-1 {
+				a[i] = append(a[i], Index(i+1)) // +X
 			}
-			if c < cols-1 {
-				a[i] = append(a[i], Index(i+1)) // RIGHT: i+1 == r*cols+(c+1)
+			if y > 0 {
+				a[i] = append(a[i], Index((y-1)*nx+x)) // -Y
 			}
-			if r < rows-1 {
-				a[i] = append(a[i], Index((r+1)*cols+c)) // DOWN
+			if y < ny-1 {
+				a[i] = append(a[i], Index((y+1)*nx+x)) // +Y
 			}
 
 		}
@@ -581,29 +695,32 @@ func buildLatticeGraph(rows, cols int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-//                 sum of
-//       pairs      paths
-//  2:      12         16
-//  3:      72        144
-//  4:     240        640
-//  5:     600       2000
-//  6:    1260       5040
-//  7:    2352      10976
-//  8:    4032      21504
-//  :       :          :
-// 37: 1872792   46195536
-// 38: 2083692   52786864
-// 39: 2311920   60109920
-// 40: 2558400   68224000
+// 2DGrid graph counts
+//
+//                   sum of
+//           pairs    paths
+//      1:       0        0
+//      2:      12       16
+//      3:      72      144
+//      4:     240      640
+//      5:     600     2000
+//      6:    1260     5040
+//      7:    2352    10976
+//      8:    4032    21504
+//             ⋮
+//     37: 1872792 46195536
+//     38: 2083692 52786864
+//     39: 2311920 60109920
+//     40: 2558400 68224000
 
-func TestLatticeGraphV1(t *testing.T) {
+func Test2DGridGraphV1(t *testing.T) {
 	// test paths on square n x n lattices
-	for n := 2; n <= 40; n++ {
+	for n := 1; n <= 40; n++ {
 		pair1 := (n * n) * (n*n - 1)
-		// sum of all pairs shortest path lengths (this was tricky to derive)
-		path1 := ((2 * n * n) * (n - 1) * n * (n + 1)) / 3
+		// sum of all pairs shortest path lengths (tricky to derive with pencil and paper)
+		path1 := (2 * n * n * n * (n*n - 1)) / 3
 
-		node, a, component := buildLatticeGraph(n, n)
+		node, a, component := build2DGridGraph(n, n)
 		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
 
 		if pair1 != pair2 || path1 != path2 {
@@ -612,14 +729,13 @@ func TestLatticeGraphV1(t *testing.T) {
 	}
 }
 
-func TestLatticeGraphV2(t *testing.T) {
+func Test2DGridGraphV2(t *testing.T) {
 	// test paths on square n x n lattices
 	for n := 2; n <= 40; n++ {
 		pair1 := (n * n) * (n*n - 1)
-		// sum of all pairs shortest path lengths (this was tricky to derive)
-		path1 := ((2 * n * n) * (n - 1) * n * (n + 1)) / 3
+		path1 := (2 * n * n * n * (n*n - 1)) / 3
 
-		node, a, component := buildLatticeGraph(n, n) // square n x n lattice
+		node, a, component := build2DGridGraph(n, n) // square n x n lattice
 		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
 
 		if pair1 != pair2 || path1 != path2 {
@@ -628,8 +744,8 @@ func TestLatticeGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSumLatticeV1(b *testing.B, n int) {
-	node, a, component := buildLatticeGraph(n, n)
+func benchmarkSum2DGridV1(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
 	b.ResetTimer()
 
 	for BN := 0; BN < b.N; BN++ {
@@ -637,19 +753,19 @@ func benchmarkSumLatticeV1(b *testing.B, n int) {
 	}
 }
 
-func BenchmarkSumLatticeV1_10(b *testing.B)  { benchmarkSumLatticeV1(b, 10) }
-func BenchmarkSumLatticeV1_20(b *testing.B)  { benchmarkSumLatticeV1(b, 20) }
-func BenchmarkSumLatticeV1_30(b *testing.B)  { benchmarkSumLatticeV1(b, 30) }
-func BenchmarkSumLatticeV1_40(b *testing.B)  { benchmarkSumLatticeV1(b, 40) }
-func BenchmarkSumLatticeV1_50(b *testing.B)  { benchmarkSumLatticeV1(b, 50) }
-func BenchmarkSumLatticeV1_60(b *testing.B)  { benchmarkSumLatticeV1(b, 60) }
-func BenchmarkSumLatticeV1_70(b *testing.B)  { benchmarkSumLatticeV1(b, 70) }
-func BenchmarkSumLatticeV1_80(b *testing.B)  { benchmarkSumLatticeV1(b, 80) }
-func BenchmarkSumLatticeV1_90(b *testing.B)  { benchmarkSumLatticeV1(b, 90) }
-func BenchmarkSumLatticeV1_100(b *testing.B) { benchmarkSumLatticeV1(b, 100) }
+func BenchmarkSum2DGridV1_10(b *testing.B)  { benchmarkSum2DGridV1(b, 10) }
+func BenchmarkSum2DGridV1_20(b *testing.B)  { benchmarkSum2DGridV1(b, 20) }
+func BenchmarkSum2DGridV1_30(b *testing.B)  { benchmarkSum2DGridV1(b, 30) }
+func BenchmarkSum2DGridV1_40(b *testing.B)  { benchmarkSum2DGridV1(b, 40) }
+func BenchmarkSum2DGridV1_50(b *testing.B)  { benchmarkSum2DGridV1(b, 50) }
+func BenchmarkSum2DGridV1_60(b *testing.B)  { benchmarkSum2DGridV1(b, 60) }
+func BenchmarkSum2DGridV1_70(b *testing.B)  { benchmarkSum2DGridV1(b, 70) }
+func BenchmarkSum2DGridV1_80(b *testing.B)  { benchmarkSum2DGridV1(b, 80) }
+func BenchmarkSum2DGridV1_90(b *testing.B)  { benchmarkSum2DGridV1(b, 90) }
+func BenchmarkSum2DGridV1_100(b *testing.B) { benchmarkSum2DGridV1(b, 100) }
 
-func benchmarkSumLatticeV2(b *testing.B, n int) {
-	node, a, component := buildLatticeGraph(n, n)
+func benchmarkSum2DGridV2(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
 	b.ResetTimer()
 
 	for BN := 0; BN < b.N; BN++ {
@@ -657,16 +773,164 @@ func benchmarkSumLatticeV2(b *testing.B, n int) {
 	}
 }
 
-func BenchmarkSumLatticeV2_10(b *testing.B)  { benchmarkSumLatticeV2(b, 10) }
-func BenchmarkSumLatticeV2_20(b *testing.B)  { benchmarkSumLatticeV2(b, 20) }
-func BenchmarkSumLatticeV2_30(b *testing.B)  { benchmarkSumLatticeV2(b, 30) }
-func BenchmarkSumLatticeV2_40(b *testing.B)  { benchmarkSumLatticeV2(b, 40) }
-func BenchmarkSumLatticeV2_50(b *testing.B)  { benchmarkSumLatticeV2(b, 50) }
-func BenchmarkSumLatticeV2_60(b *testing.B)  { benchmarkSumLatticeV2(b, 60) }
-func BenchmarkSumLatticeV2_70(b *testing.B)  { benchmarkSumLatticeV2(b, 70) }
-func BenchmarkSumLatticeV2_80(b *testing.B)  { benchmarkSumLatticeV2(b, 80) }
-func BenchmarkSumLatticeV2_90(b *testing.B)  { benchmarkSumLatticeV2(b, 90) }
-func BenchmarkSumLatticeV2_100(b *testing.B) { benchmarkSumLatticeV2(b, 100) }
+func BenchmarkSum2DGridV2_10(b *testing.B)  { benchmarkSum2DGridV2(b, 10) }
+func BenchmarkSum2DGridV2_20(b *testing.B)  { benchmarkSum2DGridV2(b, 20) }
+func BenchmarkSum2DGridV2_30(b *testing.B)  { benchmarkSum2DGridV2(b, 30) }
+func BenchmarkSum2DGridV2_40(b *testing.B)  { benchmarkSum2DGridV2(b, 40) }
+func BenchmarkSum2DGridV2_50(b *testing.B)  { benchmarkSum2DGridV2(b, 50) }
+func BenchmarkSum2DGridV2_60(b *testing.B)  { benchmarkSum2DGridV2(b, 60) }
+func BenchmarkSum2DGridV2_70(b *testing.B)  { benchmarkSum2DGridV2(b, 70) }
+func BenchmarkSum2DGridV2_80(b *testing.B)  { benchmarkSum2DGridV2(b, 80) }
+func BenchmarkSum2DGridV2_90(b *testing.B)  { benchmarkSum2DGridV2(b, 90) }
+func BenchmarkSum2DGridV2_100(b *testing.B) { benchmarkSum2DGridV2(b, 100) }
+
+//////
+
+// 3DGrid graph (grid graph, square grid graph)
+// http://en.wikipedia.org/wiki/3DGrid_graph#Square_grid_graph
+//
+// 3 x 4 lattice graph
+//
+//    O --- O --- O --- O
+//    |     |     |     |
+//    O --- O --- O --- O
+//    |     |     |     |
+//    O --- O --- O --- O
+
+func build3DGridGraph(nx, ny, nz int) ([]string, []Indexes, []Component) {
+	n := nx * ny * nz
+	node := make([]string, n)
+	// for x := 0; x < nx; x++ {
+	// 	for y := 0; y < ny; y++ {
+	// 		node[y*nx+x] = fmt.Sprintf("n[%d][%d]", x, y)
+	// 	}
+	// }
+	a := make([]Indexes, n)
+
+	for z := 0; z < nz; z++ {
+		for y := 0; y < ny; y++ {
+			for x := 0; x < nx; x++ {
+				i := z*nx*ny + y*nx + x
+				if x > 0 {
+					a[i] = append(a[i], Index(z*nx*ny+y*nx+(x-1))) // -X
+				}
+				if x < nx-1 {
+					a[i] = append(a[i], Index(z*nx*ny+y*nx+(x+1))) // +X
+				}
+				if y > 0 {
+					a[i] = append(a[i], Index(z*nx*ny+(y-1)*nx+x)) // -Y
+				}
+				if y < ny-1 {
+					a[i] = append(a[i], Index(z*nx*ny+(y+1)*nx+x)) // +Y
+				}
+				if z > 0 {
+					a[i] = append(a[i], Index((z-1)*nx*ny+y*nx+x)) // -Z
+				}
+				if z < nz-1 {
+					a[i] = append(a[i], Index((z+1)*nx*ny+y*nx+x)) // +Z
+				}
+			}
+		}
+	}
+
+	member := make([]Index, n)
+	for i := range member {
+		member[i] = Index(i)
+	}
+	component := []Component{{member, n}}
+
+	return node, a, component
+}
+
+// 3DGrid graph counts
+//
+//                   sum of
+//           pairs    paths
+//      1:       0        0
+//      2:      12       16
+//      3:      72      144
+//      4:     240      640
+//      5:     600     2000
+//      6:    1260     5040
+//      7:    2352    10976
+//      8:    4032    21504
+//             ⋮
+//     37: 1872792 46195536
+//     38: 2083692 52786864
+//     39: 2311920 60109920
+//     40: 2558400 68224000
+
+func Test3DGridGraphV1(t *testing.T) {
+	// test paths on cubic n x n x n lattices
+	for n := 1; n <= 14; n++ {
+		pair1 := (n * n * n) * (n*n*n - 1)
+		path1 := n * n * n * n * n * (n - 1) * (n + 1)
+
+		node, a, component := build3DGridGraph(n, n, n)
+		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+func Test3DGridGraphV2(t *testing.T) {
+	// test paths on cubic n x n x n lattices
+	for n := 1; n <= 14; n++ {
+		pair1 := (n * n * n) * (n*n*n - 1)
+		path1 := n * n * n * n * n * (n - 1) * (n + 1)
+
+		node, a, component := build3DGridGraph(n, n, n)
+		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+func benchmarkSum3DGridV1(b *testing.B, n int) {
+	node, a, component := build3DGridGraph(n, n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSum3DGridV1_2(b *testing.B)  { benchmarkSum3DGridV1(b, 2) }
+func BenchmarkSum3DGridV1_4(b *testing.B)  { benchmarkSum3DGridV1(b, 4) }
+func BenchmarkSum3DGridV1_6(b *testing.B)  { benchmarkSum3DGridV1(b, 6) }
+func BenchmarkSum3DGridV1_8(b *testing.B)  { benchmarkSum3DGridV1(b, 8) }
+func BenchmarkSum3DGridV1_10(b *testing.B) { benchmarkSum3DGridV1(b, 10) }
+func BenchmarkSum3DGridV1_12(b *testing.B) { benchmarkSum3DGridV1(b, 12) }
+func BenchmarkSum3DGridV1_14(b *testing.B) { benchmarkSum3DGridV1(b, 14) }
+func BenchmarkSum3DGridV1_16(b *testing.B) { benchmarkSum3DGridV1(b, 16) }
+func BenchmarkSum3DGridV1_18(b *testing.B) { benchmarkSum3DGridV1(b, 18) }
+func BenchmarkSum3DGridV1_20(b *testing.B) { benchmarkSum3DGridV1(b, 20) }
+
+func benchmarkSum3DGridV2(b *testing.B, n int) {
+	node, a, component := build3DGridGraph(n, n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, a, component)
+	}
+}
+
+func BenchmarkSum3DGridV2_2(b *testing.B)  { benchmarkSum3DGridV2(b, 2) }
+func BenchmarkSum3DGridV2_4(b *testing.B)  { benchmarkSum3DGridV2(b, 4) }
+func BenchmarkSum3DGridV2_6(b *testing.B)  { benchmarkSum3DGridV2(b, 6) }
+func BenchmarkSum3DGridV2_8(b *testing.B)  { benchmarkSum3DGridV2(b, 8) }
+func BenchmarkSum3DGridV2_10(b *testing.B) { benchmarkSum3DGridV2(b, 10) }
+func BenchmarkSum3DGridV2_12(b *testing.B) { benchmarkSum3DGridV2(b, 12) }
+func BenchmarkSum3DGridV2_14(b *testing.B) { benchmarkSum3DGridV2(b, 14) }
+func BenchmarkSum3DGridV2_16(b *testing.B) { benchmarkSum3DGridV2(b, 16) }
+func BenchmarkSum3DGridV2_18(b *testing.B) { benchmarkSum3DGridV2(b, 18) }
+func BenchmarkSum3DGridV2_20(b *testing.B) { benchmarkSum3DGridV2(b, 20) }
+
+//////
 
 // Complete bipartite graph, K_{m,n}
 // http://en.wikipedia.org/wiki/Complete_bipartite_graph
@@ -693,6 +957,21 @@ func buildCompleteBipartiteGraph(m, n int) ([]string, []Indexes, []Component) {
 
 	return node, a, component
 }
+
+// Complete bipartate graph counts
+//
+//                  sum of
+//  m  n    pairs    paths
+// 20, 1:     420      800
+// 20, 2:     462      844
+// 20, 3:     506      892
+// 20, 4:     552      944
+// 20, 5:     600     1000
+// 20, 6:     650     1060
+// 20, 7:     702     1124
+// 20, 8:     756     1192
+// 20, 9:     812     1264
+// 20,10:     870     1340
 
 func TestBipartiteGraphV1(t *testing.T) {
 	for m := 1; m <= 50; m++ {
@@ -765,6 +1044,94 @@ func BenchmarkSumBipartiteV2_700(b *testing.B)  { benchmarkSumBipartiteV2(b, 700
 func BenchmarkSumBipartiteV2_800(b *testing.B)  { benchmarkSumBipartiteV2(b, 800) }
 func BenchmarkSumBipartiteV2_900(b *testing.B)  { benchmarkSumBipartiteV2(b, 900) }
 func BenchmarkSumBipartiteV2_1000(b *testing.B) { benchmarkSumBipartiteV2(b, 1000) }
+
+// Complete binary tree, T_n (full, same height, all leaves full)
+// http://en.wikipedia.org/wiki/Binary_tree
+func buildCompleteBinaryTree(n int) ([]string, []Indexes, []Component) {
+	nodes := (1 << uint(n+1)) - 1 // 2**(n+1) - 1
+	node, component := buildGraph(nodes)
+
+	// build path graph adjacency lists
+	a := make([]Indexes, nodes)
+	for i := range a {
+		switch {
+		case i == 0: // children only
+			a[i] = []Index{Index(2*i + 1), Index(2*i + 2)}
+		case i < nodes/2: // parent and children
+			a[i] = []Index{Index((i - 1) / 2), Index(2*i + 1), Index(2*i + 2)}
+		default: // parent only
+			a[i] = []Index{Index((i - 1) / 2)}
+		}
+	}
+
+	return node, a, component
+}
+
+func TestBinaryTreeV1(t *testing.T) {
+	// test paths on square n x n lattic11es
+	for n := 1; n <= 10; n++ {
+		p := 1 << uint(n+1) // 2**(n+1)
+		pair1 := (p - 1) * (p - 2)
+		path1 := 2 * p * ((n-2)*(p+1) + 6)
+
+		node, a, component := buildCompleteBinaryTree(n)
+		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+func TestBinaryTreeV2(t *testing.T) {
+	// test paths on square n x n lattic11es
+	for n := 1; n <= 10; n++ {
+		p := 1 << uint(n+1) // 2**(n+1)
+		pair1 := (p - 1) * (p - 2)
+		path1 := 2 * p * ((n-2)*(p+1) + 6)
+
+		node, a, component := buildCompleteBinaryTree(n)
+		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+
+		if pair1 != pair2 || path1 != path2 {
+			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		}
+	}
+}
+
+func benchmarkSumTreeV1(b *testing.B, n int) {
+	node, a, component := buildCompleteBinaryTree(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSumTreeV1_2(b *testing.B)  { benchmarkSumTreeV1(b, 2) }
+func BenchmarkSumTreeV1_4(b *testing.B)  { benchmarkSumTreeV1(b, 4) }
+func BenchmarkSumTreeV1_6(b *testing.B)  { benchmarkSumTreeV1(b, 6) }
+func BenchmarkSumTreeV1_8(b *testing.B)  { benchmarkSumTreeV1(b, 8) }
+func BenchmarkSumTreeV1_10(b *testing.B) { benchmarkSumTreeV1(b, 10) }
+func BenchmarkSumTreeV1_12(b *testing.B) { benchmarkSumTreeV1(b, 12) }
+func BenchmarkSumTreeV1_14(b *testing.B) { benchmarkSumTreeV1(b, 14) }
+
+func benchmarkSumTreeV2(b *testing.B, n int) {
+	node, a, component := buildCompleteBinaryTree(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, a, component)
+	}
+}
+
+func BenchmarkSumTreeV2_2(b *testing.B)  { benchmarkSumTreeV2(b, 2) }
+func BenchmarkSumTreeV2_4(b *testing.B)  { benchmarkSumTreeV2(b, 4) }
+func BenchmarkSumTreeV2_6(b *testing.B)  { benchmarkSumTreeV2(b, 6) }
+func BenchmarkSumTreeV2_8(b *testing.B)  { benchmarkSumTreeV2(b, 8) }
+func BenchmarkSumTreeV2_10(b *testing.B) { benchmarkSumTreeV2(b, 10) }
+func BenchmarkSumTreeV2_12(b *testing.B) { benchmarkSumTreeV2(b, 12) }
+func BenchmarkSumTreeV2_14(b *testing.B) { benchmarkSumTreeV2(b, 14) }
 
 //
 // BENCHMARKS
