@@ -65,7 +65,7 @@ func buildPathGraph(n int) ([]string, []Indexes, []Component) {
 
 func TestPathGraphV1(t *testing.T) {
 	for n := 1; n <= 200; n++ {
-		pair1 := n * (n - 1)
+		pair1 := n * (n - 1)         // number of pairs
 		path1 := (n * (n*n - 1)) / 3 // sum of all pairs shortest path lengths
 
 		node, a, component := buildPathGraph(n)
@@ -90,44 +90,6 @@ func TestPathGraphV2(t *testing.T) {
 		}
 	}
 }
-
-func benchmarkSumPathV1(b *testing.B, n int) {
-	node, a, component := buildPathGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumPathV1_2000(b *testing.B)  { benchmarkSumPathV1(b, 2000) }
-func BenchmarkSumPathV1_4000(b *testing.B)  { benchmarkSumPathV1(b, 4000) }
-func BenchmarkSumPathV1_6000(b *testing.B)  { benchmarkSumPathV1(b, 6000) }
-func BenchmarkSumPathV1_8000(b *testing.B)  { benchmarkSumPathV1(b, 8000) }
-func BenchmarkSumPathV1_10000(b *testing.B) { benchmarkSumPathV1(b, 10000) }
-func BenchmarkSumPathV1_12000(b *testing.B) { benchmarkSumPathV1(b, 12000) }
-func BenchmarkSumPathV1_14000(b *testing.B) { benchmarkSumPathV1(b, 14000) }
-func BenchmarkSumPathV1_16000(b *testing.B) { benchmarkSumPathV1(b, 16000) }
-func BenchmarkSumPathV1_18000(b *testing.B) { benchmarkSumPathV1(b, 18000) }
-
-func benchmarkSumPathV2(b *testing.B, n int) {
-	node, a, component := buildPathGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumPathV2_2000(b *testing.B)  { benchmarkSumPathV2(b, 2000) }
-func BenchmarkSumPathV2_4000(b *testing.B)  { benchmarkSumPathV2(b, 4000) }
-func BenchmarkSumPathV2_6000(b *testing.B)  { benchmarkSumPathV2(b, 6000) }
-func BenchmarkSumPathV2_8000(b *testing.B)  { benchmarkSumPathV2(b, 8000) }
-func BenchmarkSumPathV2_10000(b *testing.B) { benchmarkSumPathV2(b, 10000) }
-func BenchmarkSumPathV2_12000(b *testing.B) { benchmarkSumPathV2(b, 12000) }
-func BenchmarkSumPathV2_14000(b *testing.B) { benchmarkSumPathV2(b, 14000) }
-func BenchmarkSumPathV2_16000(b *testing.B) { benchmarkSumPathV2(b, 16000) }
-func BenchmarkSumPathV2_18000(b *testing.B) { benchmarkSumPathV2(b, 18000) }
 
 // Cycle graph, C_n
 // http://en.wikipedia.org/wiki/Cycle_graph
@@ -212,44 +174,6 @@ func TestCycleGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSumCycleV1(b *testing.B, n int) {
-	node, a, component := buildCycleGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumCycleV1_2000(b *testing.B)  { benchmarkSumCycleV1(b, 2000) }
-func BenchmarkSumCycleV1_4000(b *testing.B)  { benchmarkSumCycleV1(b, 4000) }
-func BenchmarkSumCycleV1_6000(b *testing.B)  { benchmarkSumCycleV1(b, 6000) }
-func BenchmarkSumCycleV1_8000(b *testing.B)  { benchmarkSumCycleV1(b, 8000) }
-func BenchmarkSumCycleV1_10000(b *testing.B) { benchmarkSumCycleV1(b, 10000) }
-func BenchmarkSumCycleV1_12000(b *testing.B) { benchmarkSumCycleV1(b, 12000) }
-func BenchmarkSumCycleV1_14000(b *testing.B) { benchmarkSumCycleV1(b, 14000) }
-func BenchmarkSumCycleV1_16000(b *testing.B) { benchmarkSumCycleV1(b, 16000) }
-func BenchmarkSumCycleV1_18000(b *testing.B) { benchmarkSumCycleV1(b, 18000) }
-
-func benchmarkSumCycleV2(b *testing.B, n int) {
-	node, a, component := buildCycleGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumCycleV2_2000(b *testing.B)  { benchmarkSumCycleV2(b, 2000) }
-func BenchmarkSumCycleV2_4000(b *testing.B)  { benchmarkSumCycleV2(b, 4000) }
-func BenchmarkSumCycleV2_6000(b *testing.B)  { benchmarkSumCycleV2(b, 6000) }
-func BenchmarkSumCycleV2_8000(b *testing.B)  { benchmarkSumCycleV2(b, 8000) }
-func BenchmarkSumCycleV2_10000(b *testing.B) { benchmarkSumCycleV2(b, 10000) }
-func BenchmarkSumCycleV2_12000(b *testing.B) { benchmarkSumCycleV2(b, 12000) }
-func BenchmarkSumCycleV2_14000(b *testing.B) { benchmarkSumCycleV2(b, 14000) }
-func BenchmarkSumCycleV2_16000(b *testing.B) { benchmarkSumCycleV2(b, 16000) }
-func BenchmarkSumCycleV2_18000(b *testing.B) { benchmarkSumCycleV2(b, 18000) }
-
 // Complete graph, K_n
 // http://en.wikipedia.org/wiki/Complete_graph
 //
@@ -328,48 +252,6 @@ func TestCompleteGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSumCompleteV1(b *testing.B, n int) {
-	node, a, component := buildCompleteGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumCompleteV1_100(b *testing.B)  { benchmarkSumCompleteV1(b, 100) }
-func BenchmarkSumCompleteV1_200(b *testing.B)  { benchmarkSumCompleteV1(b, 200) }
-func BenchmarkSumCompleteV1_300(b *testing.B)  { benchmarkSumCompleteV1(b, 300) }
-func BenchmarkSumCompleteV1_400(b *testing.B)  { benchmarkSumCompleteV1(b, 400) }
-func BenchmarkSumCompleteV1_500(b *testing.B)  { benchmarkSumCompleteV1(b, 500) }
-func BenchmarkSumCompleteV1_600(b *testing.B)  { benchmarkSumCompleteV1(b, 600) }
-func BenchmarkSumCompleteV1_700(b *testing.B)  { benchmarkSumCompleteV1(b, 700) }
-func BenchmarkSumCompleteV1_800(b *testing.B)  { benchmarkSumCompleteV1(b, 800) }
-func BenchmarkSumCompleteV1_900(b *testing.B)  { benchmarkSumCompleteV1(b, 900) }
-func BenchmarkSumCompleteV1_1000(b *testing.B) { benchmarkSumCompleteV1(b, 1000) }
-func BenchmarkSumCompleteV1_1100(b *testing.B) { benchmarkSumCompleteV1(b, 1100) }
-
-func benchmarkSumCompleteV2(b *testing.B, n int) {
-	node, a, component := buildCompleteGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumCompleteV2_100(b *testing.B)  { benchmarkSumCompleteV2(b, 100) }
-func BenchmarkSumCompleteV2_200(b *testing.B)  { benchmarkSumCompleteV2(b, 200) }
-func BenchmarkSumCompleteV2_300(b *testing.B)  { benchmarkSumCompleteV2(b, 300) }
-func BenchmarkSumCompleteV2_400(b *testing.B)  { benchmarkSumCompleteV2(b, 400) }
-func BenchmarkSumCompleteV2_500(b *testing.B)  { benchmarkSumCompleteV2(b, 500) }
-func BenchmarkSumCompleteV2_600(b *testing.B)  { benchmarkSumCompleteV2(b, 600) }
-func BenchmarkSumCompleteV2_700(b *testing.B)  { benchmarkSumCompleteV2(b, 700) }
-func BenchmarkSumCompleteV2_800(b *testing.B)  { benchmarkSumCompleteV2(b, 800) }
-func BenchmarkSumCompleteV2_900(b *testing.B)  { benchmarkSumCompleteV2(b, 900) }
-func BenchmarkSumCompleteV2_1000(b *testing.B) { benchmarkSumCompleteV2(b, 1000) }
-func BenchmarkSumCompleteV2_1100(b *testing.B) { benchmarkSumCompleteV2(b, 1100) }
-
 // Star graph, S_n
 // http://en.wikipedia.org/wiki/Star_graph
 //
@@ -446,44 +328,6 @@ func TestStarGraphV2(t *testing.T) {
 		}
 	}
 }
-
-func benchmarkSumStarV1(b *testing.B, n int) {
-	node, a, component := buildStarGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumStarV1_2000(b *testing.B)  { benchmarkSumStarV1(b, 2000) }
-func BenchmarkSumStarV1_4000(b *testing.B)  { benchmarkSumStarV1(b, 4000) }
-func BenchmarkSumStarV1_6000(b *testing.B)  { benchmarkSumStarV1(b, 6000) }
-func BenchmarkSumStarV1_8000(b *testing.B)  { benchmarkSumStarV1(b, 8000) }
-func BenchmarkSumStarV1_10000(b *testing.B) { benchmarkSumStarV1(b, 10000) }
-func BenchmarkSumStarV1_12000(b *testing.B) { benchmarkSumStarV1(b, 12000) }
-func BenchmarkSumStarV1_14000(b *testing.B) { benchmarkSumStarV1(b, 14000) }
-func BenchmarkSumStarV1_16000(b *testing.B) { benchmarkSumStarV1(b, 16000) }
-func BenchmarkSumStarV1_18000(b *testing.B) { benchmarkSumStarV1(b, 18000) }
-
-func benchmarkSumStarV2(b *testing.B, n int) {
-	node, a, component := buildStarGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumStarV2_2000(b *testing.B)  { benchmarkSumStarV2(b, 2000) }
-func BenchmarkSumStarV2_4000(b *testing.B)  { benchmarkSumStarV2(b, 4000) }
-func BenchmarkSumStarV2_6000(b *testing.B)  { benchmarkSumStarV2(b, 6000) }
-func BenchmarkSumStarV2_8000(b *testing.B)  { benchmarkSumStarV2(b, 8000) }
-func BenchmarkSumStarV2_10000(b *testing.B) { benchmarkSumStarV2(b, 10000) }
-func BenchmarkSumStarV2_12000(b *testing.B) { benchmarkSumStarV2(b, 12000) }
-func BenchmarkSumStarV2_14000(b *testing.B) { benchmarkSumStarV2(b, 14000) }
-func BenchmarkSumStarV2_16000(b *testing.B) { benchmarkSumStarV2(b, 16000) }
-func BenchmarkSumStarV2_18000(b *testing.B) { benchmarkSumStarV2(b, 18000) }
 
 // Wheel graph, W_n
 // http://en.wikipedia.org/wiki/Wheel_graph
@@ -568,48 +412,10 @@ func TestWheelGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSumWheelV1(b *testing.B, n int) {
-	node, a, component := buildWheelGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumWheelV1_2000(b *testing.B)  { benchmarkSumWheelV1(b, 2000) }
-func BenchmarkSumWheelV1_4000(b *testing.B)  { benchmarkSumWheelV1(b, 4000) }
-func BenchmarkSumWheelV1_6000(b *testing.B)  { benchmarkSumWheelV1(b, 6000) }
-func BenchmarkSumWheelV1_8000(b *testing.B)  { benchmarkSumWheelV1(b, 8000) }
-func BenchmarkSumWheelV1_10000(b *testing.B) { benchmarkSumWheelV1(b, 10000) }
-func BenchmarkSumWheelV1_12000(b *testing.B) { benchmarkSumWheelV1(b, 12000) }
-func BenchmarkSumWheelV1_14000(b *testing.B) { benchmarkSumWheelV1(b, 14000) }
-func BenchmarkSumWheelV1_16000(b *testing.B) { benchmarkSumWheelV1(b, 16000) }
-func BenchmarkSumWheelV1_18000(b *testing.B) { benchmarkSumWheelV1(b, 18000) }
-
-func benchmarkSumWheelV2(b *testing.B, n int) {
-	node, a, component := buildWheelGraph(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumWheelV2_2000(b *testing.B)  { benchmarkSumWheelV2(b, 2000) }
-func BenchmarkSumWheelV2_4000(b *testing.B)  { benchmarkSumWheelV2(b, 4000) }
-func BenchmarkSumWheelV2_6000(b *testing.B)  { benchmarkSumWheelV2(b, 6000) }
-func BenchmarkSumWheelV2_8000(b *testing.B)  { benchmarkSumWheelV2(b, 8000) }
-func BenchmarkSumWheelV2_10000(b *testing.B) { benchmarkSumWheelV2(b, 10000) }
-func BenchmarkSumWheelV2_12000(b *testing.B) { benchmarkSumWheelV2(b, 12000) }
-func BenchmarkSumWheelV2_14000(b *testing.B) { benchmarkSumWheelV2(b, 14000) }
-func BenchmarkSumWheelV2_16000(b *testing.B) { benchmarkSumWheelV2(b, 16000) }
-func BenchmarkSumWheelV2_18000(b *testing.B) { benchmarkSumWheelV2(b, 18000) }
-
 // 2DGrid graph (grid graph, square grid graph)
 // http://en.wikipedia.org/wiki/2DGrid_graph#Square_grid_graph
 //
-// 3 x 4 lattice graph
+// 3 x 4 grid graph
 //
 //    O --- O --- O --- O
 //    |     |     |     |
@@ -617,56 +423,11 @@ func BenchmarkSumWheelV2_18000(b *testing.B) { benchmarkSumWheelV2(b, 18000) }
 //    |     |     |     |
 //    O --- O --- O --- O
 
-// func build2DGridGraph(rows, cols int) ([]string, []Indexes, []Component) {
-// 	n := rows * cols
-// 	node := make([]string, n)
-// 	// for r := 0; r < rows; r++ {
-// 	// 	for c := 0; c < cols; c++ {
-// 	// 		node[r*cols+c] = fmt.Sprintf("n[%d][%d]", r, c)
-// 	// 	}
-// 	// }
-
-// 	a := make([]Indexes, n)
-
-// 	for r := 0; r < rows; r++ {
-// 		for c := 0; c < cols; c++ {
-// 			i := r*cols + c
-
-// 			if r > 0 {
-// 				a[i] = append(a[i], Index((r-1)*cols+c)) // UP
-// 			}
-// 			if c > 0 {
-// 				a[i] = append(a[i], Index(i-1)) // LEFT: i-1 == r*cols+(c-1)
-// 			}
-// 			if c < cols-1 {
-// 				a[i] = append(a[i], Index(i+1)) // RIGHT: i+1 == r*cols+(c+1)
-// 			}
-// 			if r < rows-1 {
-// 				a[i] = append(a[i], Index((r+1)*cols+c)) // DOWN
-// 			}
-
-// 		}
-// 	}
-
-// 	member := make([]Index, n)
-// 	for i := range member {
-// 		member[i] = Index(i)
-// 	}
-// 	component := []Component{{member, n}}
-
-// 	return node, a, component
-// }
-
 func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
 	n := nx * ny
-	node := make([]string, n)
-	// for x := 0; x < nx; x++ {
-	// 	for y := 0; y < ny; y++ {
-	// 		node[y*nx+x] = fmt.Sprintf("n[%d][%d]", x, y)
-	// 	}
-	// }
-	a := make([]Indexes, n)
+	node, component := buildGraph(n)
 
+	a := make([]Indexes, n)
 	for y := 0; y < ny; y++ {
 		for x := 0; x < nx; x++ {
 			i := y*nx + x
@@ -685,12 +446,6 @@ func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
 
 		}
 	}
-
-	member := make([]Index, n)
-	for i := range member {
-		member[i] = Index(i)
-	}
-	component := []Component{{member, n}}
 
 	return node, a, component
 }
@@ -714,8 +469,7 @@ func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
 //     40: 2558400 68224000
 
 func Test2DGridGraphV1(t *testing.T) {
-	// test paths on square n x n lattices
-	for n := 1; n <= 40; n++ {
+	for n := 1; n <= 20; n++ {
 		pair1 := (n * n) * (n*n - 1)
 		// sum of all pairs shortest path lengths (tricky to derive with pencil and paper)
 		path1 := (2 * n * n * n * (n*n - 1)) / 3
@@ -730,8 +484,7 @@ func Test2DGridGraphV1(t *testing.T) {
 }
 
 func Test2DGridGraphV2(t *testing.T) {
-	// test paths on square n x n lattices
-	for n := 2; n <= 40; n++ {
+	for n := 2; n <= 20; n++ {
 		pair1 := (n * n) * (n*n - 1)
 		path1 := (2 * n * n * n * (n*n - 1)) / 3
 
@@ -744,69 +497,14 @@ func Test2DGridGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSum2DGridV1(b *testing.B, n int) {
-	node, a, component := build2DGridGraph(n, n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSum2DGridV1_10(b *testing.B)  { benchmarkSum2DGridV1(b, 10) }
-func BenchmarkSum2DGridV1_20(b *testing.B)  { benchmarkSum2DGridV1(b, 20) }
-func BenchmarkSum2DGridV1_30(b *testing.B)  { benchmarkSum2DGridV1(b, 30) }
-func BenchmarkSum2DGridV1_40(b *testing.B)  { benchmarkSum2DGridV1(b, 40) }
-func BenchmarkSum2DGridV1_50(b *testing.B)  { benchmarkSum2DGridV1(b, 50) }
-func BenchmarkSum2DGridV1_60(b *testing.B)  { benchmarkSum2DGridV1(b, 60) }
-func BenchmarkSum2DGridV1_70(b *testing.B)  { benchmarkSum2DGridV1(b, 70) }
-func BenchmarkSum2DGridV1_80(b *testing.B)  { benchmarkSum2DGridV1(b, 80) }
-func BenchmarkSum2DGridV1_90(b *testing.B)  { benchmarkSum2DGridV1(b, 90) }
-func BenchmarkSum2DGridV1_100(b *testing.B) { benchmarkSum2DGridV1(b, 100) }
-
-func benchmarkSum2DGridV2(b *testing.B, n int) {
-	node, a, component := build2DGridGraph(n, n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSum2DGridV2_10(b *testing.B)  { benchmarkSum2DGridV2(b, 10) }
-func BenchmarkSum2DGridV2_20(b *testing.B)  { benchmarkSum2DGridV2(b, 20) }
-func BenchmarkSum2DGridV2_30(b *testing.B)  { benchmarkSum2DGridV2(b, 30) }
-func BenchmarkSum2DGridV2_40(b *testing.B)  { benchmarkSum2DGridV2(b, 40) }
-func BenchmarkSum2DGridV2_50(b *testing.B)  { benchmarkSum2DGridV2(b, 50) }
-func BenchmarkSum2DGridV2_60(b *testing.B)  { benchmarkSum2DGridV2(b, 60) }
-func BenchmarkSum2DGridV2_70(b *testing.B)  { benchmarkSum2DGridV2(b, 70) }
-func BenchmarkSum2DGridV2_80(b *testing.B)  { benchmarkSum2DGridV2(b, 80) }
-func BenchmarkSum2DGridV2_90(b *testing.B)  { benchmarkSum2DGridV2(b, 90) }
-func BenchmarkSum2DGridV2_100(b *testing.B) { benchmarkSum2DGridV2(b, 100) }
-
-//////
-
 // 3DGrid graph (grid graph, square grid graph)
 // http://en.wikipedia.org/wiki/3DGrid_graph#Square_grid_graph
-//
-// 3 x 4 lattice graph
-//
-//    O --- O --- O --- O
-//    |     |     |     |
-//    O --- O --- O --- O
-//    |     |     |     |
-//    O --- O --- O --- O
 
 func build3DGridGraph(nx, ny, nz int) ([]string, []Indexes, []Component) {
 	n := nx * ny * nz
-	node := make([]string, n)
-	// for x := 0; x < nx; x++ {
-	// 	for y := 0; y < ny; y++ {
-	// 		node[y*nx+x] = fmt.Sprintf("n[%d][%d]", x, y)
-	// 	}
-	// }
-	a := make([]Indexes, n)
+	node, component := buildGraph(n)
 
+	a := make([]Indexes, n)
 	for z := 0; z < nz; z++ {
 		for y := 0; y < ny; y++ {
 			for x := 0; x < nx; x++ {
@@ -833,12 +531,6 @@ func build3DGridGraph(nx, ny, nz int) ([]string, []Indexes, []Component) {
 		}
 	}
 
-	member := make([]Index, n)
-	for i := range member {
-		member[i] = Index(i)
-	}
-	component := []Component{{member, n}}
-
 	return node, a, component
 }
 
@@ -864,7 +556,7 @@ func Test3DGridGraphV1(t *testing.T) {
 	// test paths on cubic n x n x n lattices
 	for n := 1; n <= 14; n++ {
 		pair1 := (n * n * n) * (n*n*n - 1)
-		path1 := n * n * n * n * n * (n - 1) * (n + 1)
+		path1 := n * n * n * n * n * (n*n - 1)
 
 		node, a, component := build3DGridGraph(n, n, n)
 		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
@@ -879,7 +571,7 @@ func Test3DGridGraphV2(t *testing.T) {
 	// test paths on cubic n x n x n lattices
 	for n := 1; n <= 14; n++ {
 		pair1 := (n * n * n) * (n*n*n - 1)
-		path1 := n * n * n * n * n * (n - 1) * (n + 1)
+		path1 := n * n * n * n * n * (n*n - 1)
 
 		node, a, component := build3DGridGraph(n, n, n)
 		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
@@ -890,50 +582,17 @@ func Test3DGridGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSum3DGridV1(b *testing.B, n int) {
-	node, a, component := build3DGridGraph(n, n, n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSum3DGridV1_2(b *testing.B)  { benchmarkSum3DGridV1(b, 2) }
-func BenchmarkSum3DGridV1_4(b *testing.B)  { benchmarkSum3DGridV1(b, 4) }
-func BenchmarkSum3DGridV1_6(b *testing.B)  { benchmarkSum3DGridV1(b, 6) }
-func BenchmarkSum3DGridV1_8(b *testing.B)  { benchmarkSum3DGridV1(b, 8) }
-func BenchmarkSum3DGridV1_10(b *testing.B) { benchmarkSum3DGridV1(b, 10) }
-func BenchmarkSum3DGridV1_12(b *testing.B) { benchmarkSum3DGridV1(b, 12) }
-func BenchmarkSum3DGridV1_14(b *testing.B) { benchmarkSum3DGridV1(b, 14) }
-func BenchmarkSum3DGridV1_16(b *testing.B) { benchmarkSum3DGridV1(b, 16) }
-func BenchmarkSum3DGridV1_18(b *testing.B) { benchmarkSum3DGridV1(b, 18) }
-func BenchmarkSum3DGridV1_20(b *testing.B) { benchmarkSum3DGridV1(b, 20) }
-
-func benchmarkSum3DGridV2(b *testing.B, n int) {
-	node, a, component := build3DGridGraph(n, n, n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSum3DGridV2_2(b *testing.B)  { benchmarkSum3DGridV2(b, 2) }
-func BenchmarkSum3DGridV2_4(b *testing.B)  { benchmarkSum3DGridV2(b, 4) }
-func BenchmarkSum3DGridV2_6(b *testing.B)  { benchmarkSum3DGridV2(b, 6) }
-func BenchmarkSum3DGridV2_8(b *testing.B)  { benchmarkSum3DGridV2(b, 8) }
-func BenchmarkSum3DGridV2_10(b *testing.B) { benchmarkSum3DGridV2(b, 10) }
-func BenchmarkSum3DGridV2_12(b *testing.B) { benchmarkSum3DGridV2(b, 12) }
-func BenchmarkSum3DGridV2_14(b *testing.B) { benchmarkSum3DGridV2(b, 14) }
-func BenchmarkSum3DGridV2_16(b *testing.B) { benchmarkSum3DGridV2(b, 16) }
-func BenchmarkSum3DGridV2_18(b *testing.B) { benchmarkSum3DGridV2(b, 18) }
-func BenchmarkSum3DGridV2_20(b *testing.B) { benchmarkSum3DGridV2(b, 20) }
-
-//////
-
 // Complete bipartite graph, K_{m,n}
 // http://en.wikipedia.org/wiki/Complete_bipartite_graph
+//
+// K_{5,3}:
+//
+//    O     O     O     O     O  5 in M group (not connected to each other)
+//
+//      \.................../    edge between each M and every N (M*N)
+//       \                 /     edge between each N and every M (M*N)
+//
+//          O     O     O        3 in N group (not connected to each other)
 
 func buildCompleteBipartiteGraph(m, n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(m + n)
@@ -974,8 +633,8 @@ func buildCompleteBipartiteGraph(m, n int) ([]string, []Indexes, []Component) {
 // 20,10:     870     1340
 
 func TestBipartiteGraphV1(t *testing.T) {
-	for m := 1; m <= 50; m++ {
-		for n := 1; n <= 50; n++ {
+	for m := 1; m <= 30; m++ {
+		for n := 1; n <= 30; n++ {
 			pair1 := (m + n) * (m + n - 1)
 			path1 := 2 * (m*(m-1) + m*n + n*(n-1)) // sum of all pairs shortest path lengths
 
@@ -990,8 +649,8 @@ func TestBipartiteGraphV1(t *testing.T) {
 }
 
 func TestBipartiteGraphV2(t *testing.T) {
-	for m := 1; m <= 50; m++ {
-		for n := 1; n <= 50; n++ {
+	for m := 1; m <= 30; m++ {
+		for n := 1; n <= 30; n++ {
 			pair1 := (m + n) * (m + n - 1)
 			path1 := 2 * (m*(m-1) + m*n + n*(n-1)) // sum of all pairs shortest path lengths
 
@@ -1005,67 +664,51 @@ func TestBipartiteGraphV2(t *testing.T) {
 	}
 }
 
-func benchmarkSumBipartiteV1(b *testing.B, m int) {
-	node, a, component := buildCompleteBipartiteGraph(m, m/2)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumBipartiteV1_100(b *testing.B)  { benchmarkSumBipartiteV1(b, 100) }
-func BenchmarkSumBipartiteV1_200(b *testing.B)  { benchmarkSumBipartiteV1(b, 200) }
-func BenchmarkSumBipartiteV1_300(b *testing.B)  { benchmarkSumBipartiteV1(b, 300) }
-func BenchmarkSumBipartiteV1_400(b *testing.B)  { benchmarkSumBipartiteV1(b, 400) }
-func BenchmarkSumBipartiteV1_500(b *testing.B)  { benchmarkSumBipartiteV1(b, 500) }
-func BenchmarkSumBipartiteV1_600(b *testing.B)  { benchmarkSumBipartiteV1(b, 600) }
-func BenchmarkSumBipartiteV1_700(b *testing.B)  { benchmarkSumBipartiteV1(b, 700) }
-func BenchmarkSumBipartiteV1_800(b *testing.B)  { benchmarkSumBipartiteV1(b, 800) }
-func BenchmarkSumBipartiteV1_900(b *testing.B)  { benchmarkSumBipartiteV1(b, 900) }
-func BenchmarkSumBipartiteV1_1000(b *testing.B) { benchmarkSumBipartiteV1(b, 1000) }
-
-func benchmarkSumBipartiteV2(b *testing.B, m int) {
-	node, a, component := buildCompleteBipartiteGraph(m, m/2)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumBipartiteV2_100(b *testing.B)  { benchmarkSumBipartiteV2(b, 100) }
-func BenchmarkSumBipartiteV2_200(b *testing.B)  { benchmarkSumBipartiteV2(b, 200) }
-func BenchmarkSumBipartiteV2_300(b *testing.B)  { benchmarkSumBipartiteV2(b, 300) }
-func BenchmarkSumBipartiteV2_400(b *testing.B)  { benchmarkSumBipartiteV2(b, 400) }
-func BenchmarkSumBipartiteV2_500(b *testing.B)  { benchmarkSumBipartiteV2(b, 500) }
-func BenchmarkSumBipartiteV2_600(b *testing.B)  { benchmarkSumBipartiteV2(b, 600) }
-func BenchmarkSumBipartiteV2_700(b *testing.B)  { benchmarkSumBipartiteV2(b, 700) }
-func BenchmarkSumBipartiteV2_800(b *testing.B)  { benchmarkSumBipartiteV2(b, 800) }
-func BenchmarkSumBipartiteV2_900(b *testing.B)  { benchmarkSumBipartiteV2(b, 900) }
-func BenchmarkSumBipartiteV2_1000(b *testing.B) { benchmarkSumBipartiteV2(b, 1000) }
-
 // Complete binary tree, T_n (full, same height, all leaves full)
 // http://en.wikipedia.org/wiki/Binary_tree
-func buildCompleteBinaryTree(n int) ([]string, []Indexes, []Component) {
-	nodes := (1 << uint(n+1)) - 1 // 2**(n+1) - 1
-	node, component := buildGraph(nodes)
+func buildCompleteBinaryTree(height int) ([]string, []Indexes, []Component) {
+	n := (1 << uint(height+1)) - 1 // 2**(height+1) - 1
+	node, component := buildGraph(n)
 
 	// build path graph adjacency lists
-	a := make([]Indexes, nodes)
+	a := make([]Indexes, n)
 	for i := range a {
 		switch {
-		case i == 0: // children only
-			a[i] = []Index{Index(2*i + 1), Index(2*i + 2)}
-		case i < nodes/2: // parent and children
-			a[i] = []Index{Index((i - 1) / 2), Index(2*i + 1), Index(2*i + 2)}
-		default: // parent only
-			a[i] = []Index{Index((i - 1) / 2)}
+		case i == 0: // root
+			a[i] = []Index{
+				Index(2*i + 1), // left child
+				Index(2*i + 2), // right child
+			}
+		case i < n/2: // internal
+			a[i] = []Index{
+				Index(2*i + 1),     // left child
+				Index(2*i + 2),     // right child
+				Index((i - 1) / 2), // parent
+			}
+		default: // leaf
+			a[i] = []Index{
+				Index((i - 1) / 2), // parent
+			}
 		}
 	}
 
 	return node, a, component
 }
+
+// Complete binary tree counts
+//
+//                    sum of
+// height   pairs      paths
+//      1:       6         8
+//      2:      42        96
+//      3:     210       736
+//      4:     930      4608
+//      5:    3906     25728
+//      6:   16002    133632
+//      7:   64770    660992
+//      8:  260610   3158016
+//      9: 1045506  14706688
+//     10: 4188162  67166208
 
 func TestBinaryTreeV1(t *testing.T) {
 	// test paths on square n x n lattic11es
@@ -1098,40 +741,6 @@ func TestBinaryTreeV2(t *testing.T) {
 		}
 	}
 }
-
-func benchmarkSumTreeV1(b *testing.B, n int) {
-	node, a, component := buildCompleteBinaryTree(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV1(node, a, component)
-	}
-}
-
-func BenchmarkSumTreeV1_2(b *testing.B)  { benchmarkSumTreeV1(b, 2) }
-func BenchmarkSumTreeV1_4(b *testing.B)  { benchmarkSumTreeV1(b, 4) }
-func BenchmarkSumTreeV1_6(b *testing.B)  { benchmarkSumTreeV1(b, 6) }
-func BenchmarkSumTreeV1_8(b *testing.B)  { benchmarkSumTreeV1(b, 8) }
-func BenchmarkSumTreeV1_10(b *testing.B) { benchmarkSumTreeV1(b, 10) }
-func BenchmarkSumTreeV1_12(b *testing.B) { benchmarkSumTreeV1(b, 12) }
-func BenchmarkSumTreeV1_14(b *testing.B) { benchmarkSumTreeV1(b, 14) }
-
-func benchmarkSumTreeV2(b *testing.B, n int) {
-	node, a, component := buildCompleteBinaryTree(n)
-	b.ResetTimer()
-
-	for BN := 0; BN < b.N; BN++ {
-		sumAllSourcesShortestPathsV2(node, a, component)
-	}
-}
-
-func BenchmarkSumTreeV2_2(b *testing.B)  { benchmarkSumTreeV2(b, 2) }
-func BenchmarkSumTreeV2_4(b *testing.B)  { benchmarkSumTreeV2(b, 4) }
-func BenchmarkSumTreeV2_6(b *testing.B)  { benchmarkSumTreeV2(b, 6) }
-func BenchmarkSumTreeV2_8(b *testing.B)  { benchmarkSumTreeV2(b, 8) }
-func BenchmarkSumTreeV2_10(b *testing.B) { benchmarkSumTreeV2(b, 10) }
-func BenchmarkSumTreeV2_12(b *testing.B) { benchmarkSumTreeV2(b, 12) }
-func BenchmarkSumTreeV2_14(b *testing.B) { benchmarkSumTreeV2(b, 14) }
 
 //
 // BENCHMARKS
@@ -1255,3 +864,355 @@ func BenchmarkSumASSPV2_webster6(b *testing.B) { benchmarkSumASSPV2(b, "words/we
 func BenchmarkSumASSPV2_webster7(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-7", 7) }
 func BenchmarkSumASSPV2_webster8(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-8", 8) }
 func BenchmarkSumASSPV2_webster9(b *testing.B) { benchmarkSumASSPV2(b, "words/webster-9", 9) }
+
+//
+// Benchmark the solving of various simple graph types
+//
+
+func benchmarkSumPathV1(b *testing.B, n int) {
+	node, a, component := buildPathGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSumPathV1_2000(b *testing.B)  { benchmarkSumPathV1(b, 2000) }
+func BenchmarkSumPathV1_4000(b *testing.B)  { benchmarkSumPathV1(b, 4000) }
+func BenchmarkSumPathV1_6000(b *testing.B)  { benchmarkSumPathV1(b, 6000) }
+func BenchmarkSumPathV1_8000(b *testing.B)  { benchmarkSumPathV1(b, 8000) }
+func BenchmarkSumPathV1_10000(b *testing.B) { benchmarkSumPathV1(b, 10000) }
+func BenchmarkSumPathV1_12000(b *testing.B) { benchmarkSumPathV1(b, 12000) }
+func BenchmarkSumPathV1_14000(b *testing.B) { benchmarkSumPathV1(b, 14000) }
+func BenchmarkSumPathV1_16000(b *testing.B) { benchmarkSumPathV1(b, 16000) }
+func BenchmarkSumPathV1_18000(b *testing.B) { benchmarkSumPathV1(b, 18000) }
+
+func benchmarkSumPathV2(b *testing.B, n int) {
+	node, a, component := buildPathGraph(n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, a, component)
+	}
+}
+
+func BenchmarkSumPathV2_2000(b *testing.B)  { benchmarkSumPathV2(b, 2000) }
+func BenchmarkSumPathV2_4000(b *testing.B)  { benchmarkSumPathV2(b, 4000) }
+func BenchmarkSumPathV2_6000(b *testing.B)  { benchmarkSumPathV2(b, 6000) }
+func BenchmarkSumPathV2_8000(b *testing.B)  { benchmarkSumPathV2(b, 8000) }
+func BenchmarkSumPathV2_10000(b *testing.B) { benchmarkSumPathV2(b, 10000) }
+func BenchmarkSumPathV2_12000(b *testing.B) { benchmarkSumPathV2(b, 12000) }
+func BenchmarkSumPathV2_14000(b *testing.B) { benchmarkSumPathV2(b, 14000) }
+func BenchmarkSumPathV2_16000(b *testing.B) { benchmarkSumPathV2(b, 16000) }
+func BenchmarkSumPathV2_18000(b *testing.B) { benchmarkSumPathV2(b, 18000) }
+
+// func benchmarkSumCycleV1(b *testing.B, n int) {
+// 	node, a, component := buildCycleGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumCycleV1_2000(b *testing.B)  { benchmarkSumCycleV1(b, 2000) }
+// func BenchmarkSumCycleV1_4000(b *testing.B)  { benchmarkSumCycleV1(b, 4000) }
+// func BenchmarkSumCycleV1_6000(b *testing.B)  { benchmarkSumCycleV1(b, 6000) }
+// func BenchmarkSumCycleV1_8000(b *testing.B)  { benchmarkSumCycleV1(b, 8000) }
+// func BenchmarkSumCycleV1_10000(b *testing.B) { benchmarkSumCycleV1(b, 10000) }
+// func BenchmarkSumCycleV1_12000(b *testing.B) { benchmarkSumCycleV1(b, 12000) }
+// func BenchmarkSumCycleV1_14000(b *testing.B) { benchmarkSumCycleV1(b, 14000) }
+// func BenchmarkSumCycleV1_16000(b *testing.B) { benchmarkSumCycleV1(b, 16000) }
+// func BenchmarkSumCycleV1_18000(b *testing.B) { benchmarkSumCycleV1(b, 18000) }
+
+// func benchmarkSumCycleV2(b *testing.B, n int) {
+// 	node, a, component := buildCycleGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumCycleV2_2000(b *testing.B)  { benchmarkSumCycleV2(b, 2000) }
+// func BenchmarkSumCycleV2_4000(b *testing.B)  { benchmarkSumCycleV2(b, 4000) }
+// func BenchmarkSumCycleV2_6000(b *testing.B)  { benchmarkSumCycleV2(b, 6000) }
+// func BenchmarkSumCycleV2_8000(b *testing.B)  { benchmarkSumCycleV2(b, 8000) }
+// func BenchmarkSumCycleV2_10000(b *testing.B) { benchmarkSumCycleV2(b, 10000) }
+// func BenchmarkSumCycleV2_12000(b *testing.B) { benchmarkSumCycleV2(b, 12000) }
+// func BenchmarkSumCycleV2_14000(b *testing.B) { benchmarkSumCycleV2(b, 14000) }
+// func BenchmarkSumCycleV2_16000(b *testing.B) { benchmarkSumCycleV2(b, 16000) }
+// func BenchmarkSumCycleV2_18000(b *testing.B) { benchmarkSumCycleV2(b, 18000) }
+
+// func benchmarkSumCompleteV1(b *testing.B, n int) {
+// 	node, a, component := buildCompleteGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumCompleteV1_100(b *testing.B)  { benchmarkSumCompleteV1(b, 100) }
+// func BenchmarkSumCompleteV1_200(b *testing.B)  { benchmarkSumCompleteV1(b, 200) }
+// func BenchmarkSumCompleteV1_300(b *testing.B)  { benchmarkSumCompleteV1(b, 300) }
+// func BenchmarkSumCompleteV1_400(b *testing.B)  { benchmarkSumCompleteV1(b, 400) }
+// func BenchmarkSumCompleteV1_500(b *testing.B)  { benchmarkSumCompleteV1(b, 500) }
+// func BenchmarkSumCompleteV1_600(b *testing.B)  { benchmarkSumCompleteV1(b, 600) }
+// func BenchmarkSumCompleteV1_700(b *testing.B)  { benchmarkSumCompleteV1(b, 700) }
+// func BenchmarkSumCompleteV1_800(b *testing.B)  { benchmarkSumCompleteV1(b, 800) }
+// func BenchmarkSumCompleteV1_900(b *testing.B)  { benchmarkSumCompleteV1(b, 900) }
+// func BenchmarkSumCompleteV1_1000(b *testing.B) { benchmarkSumCompleteV1(b, 1000) }
+// func BenchmarkSumCompleteV1_1100(b *testing.B) { benchmarkSumCompleteV1(b, 1100) }
+
+// func benchmarkSumCompleteV2(b *testing.B, n int) {
+// 	node, a, component := buildCompleteGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumCompleteV2_100(b *testing.B)  { benchmarkSumCompleteV2(b, 100) }
+// func BenchmarkSumCompleteV2_200(b *testing.B)  { benchmarkSumCompleteV2(b, 200) }
+// func BenchmarkSumCompleteV2_300(b *testing.B)  { benchmarkSumCompleteV2(b, 300) }
+// func BenchmarkSumCompleteV2_400(b *testing.B)  { benchmarkSumCompleteV2(b, 400) }
+// func BenchmarkSumCompleteV2_500(b *testing.B)  { benchmarkSumCompleteV2(b, 500) }
+// func BenchmarkSumCompleteV2_600(b *testing.B)  { benchmarkSumCompleteV2(b, 600) }
+// func BenchmarkSumCompleteV2_700(b *testing.B)  { benchmarkSumCompleteV2(b, 700) }
+// func BenchmarkSumCompleteV2_800(b *testing.B)  { benchmarkSumCompleteV2(b, 800) }
+// func BenchmarkSumCompleteV2_900(b *testing.B)  { benchmarkSumCompleteV2(b, 900) }
+// func BenchmarkSumCompleteV2_1000(b *testing.B) { benchmarkSumCompleteV2(b, 1000) }
+// func BenchmarkSumCompleteV2_1100(b *testing.B) { benchmarkSumCompleteV2(b, 1100) }
+
+// func benchmarkSumStarV1(b *testing.B, n int) {
+// 	node, a, component := buildStarGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumStarV1_2000(b *testing.B)  { benchmarkSumStarV1(b, 2000) }
+// func BenchmarkSumStarV1_4000(b *testing.B)  { benchmarkSumStarV1(b, 4000) }
+// func BenchmarkSumStarV1_6000(b *testing.B)  { benchmarkSumStarV1(b, 6000) }
+// func BenchmarkSumStarV1_8000(b *testing.B)  { benchmarkSumStarV1(b, 8000) }
+// func BenchmarkSumStarV1_10000(b *testing.B) { benchmarkSumStarV1(b, 10000) }
+// func BenchmarkSumStarV1_12000(b *testing.B) { benchmarkSumStarV1(b, 12000) }
+// func BenchmarkSumStarV1_14000(b *testing.B) { benchmarkSumStarV1(b, 14000) }
+// func BenchmarkSumStarV1_16000(b *testing.B) { benchmarkSumStarV1(b, 16000) }
+// func BenchmarkSumStarV1_18000(b *testing.B) { benchmarkSumStarV1(b, 18000) }
+
+// func benchmarkSumStarV2(b *testing.B, n int) {
+// 	node, a, component := buildStarGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumStarV2_2000(b *testing.B)  { benchmarkSumStarV2(b, 2000) }
+// func BenchmarkSumStarV2_4000(b *testing.B)  { benchmarkSumStarV2(b, 4000) }
+// func BenchmarkSumStarV2_6000(b *testing.B)  { benchmarkSumStarV2(b, 6000) }
+// func BenchmarkSumStarV2_8000(b *testing.B)  { benchmarkSumStarV2(b, 8000) }
+// func BenchmarkSumStarV2_10000(b *testing.B) { benchmarkSumStarV2(b, 10000) }
+// func BenchmarkSumStarV2_12000(b *testing.B) { benchmarkSumStarV2(b, 12000) }
+// func BenchmarkSumStarV2_14000(b *testing.B) { benchmarkSumStarV2(b, 14000) }
+// func BenchmarkSumStarV2_16000(b *testing.B) { benchmarkSumStarV2(b, 16000) }
+// func BenchmarkSumStarV2_18000(b *testing.B) { benchmarkSumStarV2(b, 18000) }
+
+// func benchmarkSumWheelV1(b *testing.B, n int) {
+// 	node, a, component := buildWheelGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumWheelV1_2000(b *testing.B)  { benchmarkSumWheelV1(b, 2000) }
+// func BenchmarkSumWheelV1_4000(b *testing.B)  { benchmarkSumWheelV1(b, 4000) }
+// func BenchmarkSumWheelV1_6000(b *testing.B)  { benchmarkSumWheelV1(b, 6000) }
+// func BenchmarkSumWheelV1_8000(b *testing.B)  { benchmarkSumWheelV1(b, 8000) }
+// func BenchmarkSumWheelV1_10000(b *testing.B) { benchmarkSumWheelV1(b, 10000) }
+// func BenchmarkSumWheelV1_12000(b *testing.B) { benchmarkSumWheelV1(b, 12000) }
+// func BenchmarkSumWheelV1_14000(b *testing.B) { benchmarkSumWheelV1(b, 14000) }
+// func BenchmarkSumWheelV1_16000(b *testing.B) { benchmarkSumWheelV1(b, 16000) }
+// func BenchmarkSumWheelV1_18000(b *testing.B) { benchmarkSumWheelV1(b, 18000) }
+
+// func benchmarkSumWheelV2(b *testing.B, n int) {
+// 	node, a, component := buildWheelGraph(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumWheelV2_2000(b *testing.B)  { benchmarkSumWheelV2(b, 2000) }
+// func BenchmarkSumWheelV2_4000(b *testing.B)  { benchmarkSumWheelV2(b, 4000) }
+// func BenchmarkSumWheelV2_6000(b *testing.B)  { benchmarkSumWheelV2(b, 6000) }
+// func BenchmarkSumWheelV2_8000(b *testing.B)  { benchmarkSumWheelV2(b, 8000) }
+// func BenchmarkSumWheelV2_10000(b *testing.B) { benchmarkSumWheelV2(b, 10000) }
+// func BenchmarkSumWheelV2_12000(b *testing.B) { benchmarkSumWheelV2(b, 12000) }
+// func BenchmarkSumWheelV2_14000(b *testing.B) { benchmarkSumWheelV2(b, 14000) }
+// func BenchmarkSumWheelV2_16000(b *testing.B) { benchmarkSumWheelV2(b, 16000) }
+// func BenchmarkSumWheelV2_18000(b *testing.B) { benchmarkSumWheelV2(b, 18000) }
+
+func benchmarkSum2DGridV1(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSum2DGridV1_10(b *testing.B)  { benchmarkSum2DGridV1(b, 10) }
+func BenchmarkSum2DGridV1_20(b *testing.B)  { benchmarkSum2DGridV1(b, 20) }
+func BenchmarkSum2DGridV1_30(b *testing.B)  { benchmarkSum2DGridV1(b, 30) }
+func BenchmarkSum2DGridV1_40(b *testing.B)  { benchmarkSum2DGridV1(b, 40) }
+func BenchmarkSum2DGridV1_50(b *testing.B)  { benchmarkSum2DGridV1(b, 50) }
+func BenchmarkSum2DGridV1_60(b *testing.B)  { benchmarkSum2DGridV1(b, 60) }
+func BenchmarkSum2DGridV1_70(b *testing.B)  { benchmarkSum2DGridV1(b, 70) }
+func BenchmarkSum2DGridV1_80(b *testing.B)  { benchmarkSum2DGridV1(b, 80) }
+func BenchmarkSum2DGridV1_90(b *testing.B)  { benchmarkSum2DGridV1(b, 90) }
+func BenchmarkSum2DGridV1_100(b *testing.B) { benchmarkSum2DGridV1(b, 100) }
+
+func benchmarkSum2DGridV2(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesShortestPathsV2(node, a, component)
+	}
+}
+
+func BenchmarkSum2DGridV2_10(b *testing.B)  { benchmarkSum2DGridV2(b, 10) }
+func BenchmarkSum2DGridV2_20(b *testing.B)  { benchmarkSum2DGridV2(b, 20) }
+func BenchmarkSum2DGridV2_30(b *testing.B)  { benchmarkSum2DGridV2(b, 30) }
+func BenchmarkSum2DGridV2_40(b *testing.B)  { benchmarkSum2DGridV2(b, 40) }
+func BenchmarkSum2DGridV2_50(b *testing.B)  { benchmarkSum2DGridV2(b, 50) }
+func BenchmarkSum2DGridV2_60(b *testing.B)  { benchmarkSum2DGridV2(b, 60) }
+func BenchmarkSum2DGridV2_70(b *testing.B)  { benchmarkSum2DGridV2(b, 70) }
+func BenchmarkSum2DGridV2_80(b *testing.B)  { benchmarkSum2DGridV2(b, 80) }
+func BenchmarkSum2DGridV2_90(b *testing.B)  { benchmarkSum2DGridV2(b, 90) }
+func BenchmarkSum2DGridV2_100(b *testing.B) { benchmarkSum2DGridV2(b, 100) }
+
+// func benchmarkSum3DGridV1(b *testing.B, n int) {
+// 	node, a, component := build3DGridGraph(n, n, n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSum3DGridV1_2(b *testing.B)  { benchmarkSum3DGridV1(b, 2) }
+// func BenchmarkSum3DGridV1_4(b *testing.B)  { benchmarkSum3DGridV1(b, 4) }
+// func BenchmarkSum3DGridV1_6(b *testing.B)  { benchmarkSum3DGridV1(b, 6) }
+// func BenchmarkSum3DGridV1_8(b *testing.B)  { benchmarkSum3DGridV1(b, 8) }
+// func BenchmarkSum3DGridV1_10(b *testing.B) { benchmarkSum3DGridV1(b, 10) }
+// func BenchmarkSum3DGridV1_12(b *testing.B) { benchmarkSum3DGridV1(b, 12) }
+// func BenchmarkSum3DGridV1_14(b *testing.B) { benchmarkSum3DGridV1(b, 14) }
+// func BenchmarkSum3DGridV1_16(b *testing.B) { benchmarkSum3DGridV1(b, 16) }
+// func BenchmarkSum3DGridV1_18(b *testing.B) { benchmarkSum3DGridV1(b, 18) }
+// func BenchmarkSum3DGridV1_20(b *testing.B) { benchmarkSum3DGridV1(b, 20) }
+
+// func benchmarkSum3DGridV2(b *testing.B, n int) {
+// 	node, a, component := build3DGridGraph(n, n, n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSum3DGridV2_2(b *testing.B)  { benchmarkSum3DGridV2(b, 2) }
+// func BenchmarkSum3DGridV2_4(b *testing.B)  { benchmarkSum3DGridV2(b, 4) }
+// func BenchmarkSum3DGridV2_6(b *testing.B)  { benchmarkSum3DGridV2(b, 6) }
+// func BenchmarkSum3DGridV2_8(b *testing.B)  { benchmarkSum3DGridV2(b, 8) }
+// func BenchmarkSum3DGridV2_10(b *testing.B) { benchmarkSum3DGridV2(b, 10) }
+// func BenchmarkSum3DGridV2_12(b *testing.B) { benchmarkSum3DGridV2(b, 12) }
+// func BenchmarkSum3DGridV2_14(b *testing.B) { benchmarkSum3DGridV2(b, 14) }
+// func BenchmarkSum3DGridV2_16(b *testing.B) { benchmarkSum3DGridV2(b, 16) }
+// func BenchmarkSum3DGridV2_18(b *testing.B) { benchmarkSum3DGridV2(b, 18) }
+// func BenchmarkSum3DGridV2_20(b *testing.B) { benchmarkSum3DGridV2(b, 20) }
+
+// func benchmarkSumBipartiteV1(b *testing.B, m int) {
+// 	node, a, component := buildCompleteBipartiteGraph(m, m/2)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumBipartiteV1_100(b *testing.B)  { benchmarkSumBipartiteV1(b, 100) }
+// func BenchmarkSumBipartiteV1_200(b *testing.B)  { benchmarkSumBipartiteV1(b, 200) }
+// func BenchmarkSumBipartiteV1_300(b *testing.B)  { benchmarkSumBipartiteV1(b, 300) }
+// func BenchmarkSumBipartiteV1_400(b *testing.B)  { benchmarkSumBipartiteV1(b, 400) }
+// func BenchmarkSumBipartiteV1_500(b *testing.B)  { benchmarkSumBipartiteV1(b, 500) }
+// func BenchmarkSumBipartiteV1_600(b *testing.B)  { benchmarkSumBipartiteV1(b, 600) }
+// func BenchmarkSumBipartiteV1_700(b *testing.B)  { benchmarkSumBipartiteV1(b, 700) }
+// func BenchmarkSumBipartiteV1_800(b *testing.B)  { benchmarkSumBipartiteV1(b, 800) }
+// func BenchmarkSumBipartiteV1_900(b *testing.B)  { benchmarkSumBipartiteV1(b, 900) }
+// func BenchmarkSumBipartiteV1_1000(b *testing.B) { benchmarkSumBipartiteV1(b, 1000) }
+
+// func benchmarkSumBipartiteV2(b *testing.B, m int) {
+// 	node, a, component := buildCompleteBipartiteGraph(m, m/2)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumBipartiteV2_100(b *testing.B)  { benchmarkSumBipartiteV2(b, 100) }
+// func BenchmarkSumBipartiteV2_200(b *testing.B)  { benchmarkSumBipartiteV2(b, 200) }
+// func BenchmarkSumBipartiteV2_300(b *testing.B)  { benchmarkSumBipartiteV2(b, 300) }
+// func BenchmarkSumBipartiteV2_400(b *testing.B)  { benchmarkSumBipartiteV2(b, 400) }
+// func BenchmarkSumBipartiteV2_500(b *testing.B)  { benchmarkSumBipartiteV2(b, 500) }
+// func BenchmarkSumBipartiteV2_600(b *testing.B)  { benchmarkSumBipartiteV2(b, 600) }
+// func BenchmarkSumBipartiteV2_700(b *testing.B)  { benchmarkSumBipartiteV2(b, 700) }
+// func BenchmarkSumBipartiteV2_800(b *testing.B)  { benchmarkSumBipartiteV2(b, 800) }
+// func BenchmarkSumBipartiteV2_900(b *testing.B)  { benchmarkSumBipartiteV2(b, 900) }
+// func BenchmarkSumBipartiteV2_1000(b *testing.B) { benchmarkSumBipartiteV2(b, 1000) }
+
+// func benchmarkSumTreeV1(b *testing.B, n int) {
+// 	node, a, component := buildCompleteBinaryTree(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV1(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumTreeV1_2(b *testing.B)  { benchmarkSumTreeV1(b, 2) }
+// func BenchmarkSumTreeV1_4(b *testing.B)  { benchmarkSumTreeV1(b, 4) }
+// func BenchmarkSumTreeV1_6(b *testing.B)  { benchmarkSumTreeV1(b, 6) }
+// func BenchmarkSumTreeV1_8(b *testing.B)  { benchmarkSumTreeV1(b, 8) }
+// func BenchmarkSumTreeV1_10(b *testing.B) { benchmarkSumTreeV1(b, 10) }
+// func BenchmarkSumTreeV1_12(b *testing.B) { benchmarkSumTreeV1(b, 12) }
+// func BenchmarkSumTreeV1_14(b *testing.B) { benchmarkSumTreeV1(b, 14) }
+
+// func benchmarkSumTreeV2(b *testing.B, n int) {
+// 	node, a, component := buildCompleteBinaryTree(n)
+// 	b.ResetTimer()
+
+// 	for BN := 0; BN < b.N; BN++ {
+// 		sumAllSourcesShortestPathsV2(node, a, component)
+// 	}
+// }
+
+// func BenchmarkSumTreeV2_2(b *testing.B)  { benchmarkSumTreeV2(b, 2) }
+// func BenchmarkSumTreeV2_4(b *testing.B)  { benchmarkSumTreeV2(b, 4) }
+// func BenchmarkSumTreeV2_6(b *testing.B)  { benchmarkSumTreeV2(b, 6) }
+// func BenchmarkSumTreeV2_8(b *testing.B)  { benchmarkSumTreeV2(b, 8) }
+// func BenchmarkSumTreeV2_10(b *testing.B) { benchmarkSumTreeV2(b, 10) }
+// func BenchmarkSumTreeV2_12(b *testing.B) { benchmarkSumTreeV2(b, 12) }
+// func BenchmarkSumTreeV2_14(b *testing.B) { benchmarkSumTreeV2(b, 14) }
