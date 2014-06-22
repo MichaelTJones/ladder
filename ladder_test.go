@@ -17,6 +17,8 @@ func buildGraph(n int) ([]string, []Component) {
 	return node, component
 }
 
+type Summer func(word []string, pair []Indexes, component []Component) (int, int, int)
+
 // Path graph, P_n
 // http://en.wikipedia.org/wiki/Path_graph
 //
@@ -29,7 +31,7 @@ func buildGraph(n int) ([]string, []Component) {
 func buildPathGraph(n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(n)
 
-	// build path graph adjacency lists
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for i := range a {
 		switch {
@@ -45,133 +47,61 @@ func buildPathGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// Path graph counts
+// Path graph
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                sum of
-//      n  pairs   paths
-//      1:     0       0
-//      2:     2       2
-//      3:     6       8
-//      4:    12      20
-//      5:    20      40
-//      6:    30      70
-//      7:    42     112
-//      8:    56     168
-//             ⋮
-//    197: 38612 2548392
-//    198: 39006 2587398
-//    199: 39402 2626800
-//    200: 39800 2666600
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      2:       2          2          2
+//      3:       6          6          8
+//      4:      12         12         20
+//      5:      20         20         40
+//      6:      30         30         70
+//      7:      42         42        112
+//      8:      56         56        168
+//      9:      72         72        240
+//     10:      90         90        330
+//               ⋮
+//     97:    9312       9312     304192
+//     98:    9506       9506     313698
+//     99:    9702       9702     323400
+//    100:    9900       9900     333300
 
-func TestPathGraphV1(t *testing.T) {
-	for n := 1; n <= 200; n++ {
-		pair1 := n * (n - 1)         // number of pairs
-		path1 := (n * (n*n - 1)) / 3 // sum of all pairs shortest path lengths
+func testPathGraph(t *testing.T, summer Summer) {
+	for n := 1; n <= 100; n++ {
+		pairs := n * (n - 1)
+		paths := pairs
+		sum := (n * (n*n - 1)) / 3
 
 		node, a, component := buildPathGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func TestPathGraphV2(t *testing.T) {
-	for n := 1; n <= 200; n++ {
-		pair1 := n * (n - 1)
-		path1 := (n * (n*n - 1)) / 3 // sum of all pairs shortest path lengths
-
-		node, a, component := buildPathGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
-
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
+func TestPathGraphOneV1(t *testing.T) {
+	testPathGraph(t, sumAllSourcesShortestPathsV1)
 }
 
-// Cycle graph, C_n
-// http://en.wikipedia.org/wiki/Cycle_graph
+func TestPathGraphOneV2(t *testing.T) {
+	testPathGraph(t, sumAllSourcesShortestPathsV2)
+}
+
 //
-// 4 node cycle graph
+// same values as table above for the All version
 //
-//    O ---- O
-//    |      |
-//    |      |
-//    O ---- O
 
-func buildCycleGraph(n int) ([]string, []Indexes, []Component) {
-	node, component := buildGraph(n)
-
-	// build cycle graph adjacency lists
-	a := make([]Indexes, n)
-	for i := range a {
-		a[i] = []Index{
-			Index((i - 1 + n) % n),
-			Index((i + 1) % n),
-		}
-	}
-
-	return node, a, component
+func TestPathGraphAllV1(t *testing.T) {
+	testPathGraph(t, sumAllSourcesAllShortestPathsV1)
 }
 
-// Cycle graph counts
-//
-//                sum of
-//      n  pairs   paths
-//      3:     6       6
-//      4:    12      16
-//      5:    20      30
-//      6:    30      54
-//      7:    42      84
-//      8:    56     128
-//             ⋮
-//    197: 38612 1911294
-//    198: 39006 1940598
-//    199: 39402 1970100
-//    200: 39800 2000000
-
-func TestCycleGraphV1(t *testing.T) {
-	for n := 3; n <= 200; n++ {
-		pair1 := n * (n - 1)
-
-		var path1 int // sum of all pairs shortest path lengths
-		switch n & 1 {
-		case 0:
-			path1 = (n * n * n) / 4
-		case 1:
-			path1 = (n * (n*n - 1)) / 4
-		}
-
-		node, a, component := buildCycleGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
-
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
-}
-
-func TestCycleGraphV2(t *testing.T) {
-	for n := 3; n <= 200; n++ {
-		pair1 := n * (n - 1)
-
-		var path1 int // sum of all pairs shortest path lengths
-		switch n & 1 {
-		case 0:
-			path1 = (n * n * n) / 4
-		case 1:
-			path1 = (n * (n*n - 1)) / 4
-		}
-
-		node, a, component := buildCycleGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
-
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
+func TestPathGraphAllV2(t *testing.T) {
+	testPathGraph(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // Complete graph, K_n
@@ -187,11 +117,12 @@ func TestCycleGraphV2(t *testing.T) {
 //  | /   \ |
 //  O ----- O
 
-// every node is connected to every other node, all shortest paths have length one
+// every node is connected to every other node,
+// so all shortest paths have length one
 func buildCompleteGraph(n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(n)
 
-	// build complete graph adjacency lists
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for i := range a {
 		a[i] = make([]Index, n-1)
@@ -206,50 +137,61 @@ func buildCompleteGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// Complete graph counts
+// Complete graph
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                sum of
-//      n  pairs   paths
-//      1:     0       0
-//      2:     2       2
-//      3:     6       6
-//      4:    12      12
-//      5:    20      20
-//      6:    30      30
-//      7:    42      42
-//      8:    56      56
-//             ⋮
-//     97:  9312    9312
-//     98:  9506    9506
-//     99:  9702    9702
-//    100:  9900    9900
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      3:       6          6          6
+//      4:      12         12         12
+//      5:      20         20         20
+//      6:      30         30         30
+//      7:      42         42         42
+//      8:      56         56         56
+//      9:      72         72         72
+//     10:      90         90         90
+//     11:     110        110        110
+//               ⋮
+//     97:    9312       9312       9312
+//     98:    9506       9506       9506
+//     99:    9702       9702       9702
+//    100:    9900       9900       9900
 
-func TestCompleteGraphV1(t *testing.T) {
-	for n := 1; n <= 100; n++ {
-		pair1 := n * (n - 1)
-		path1 := n * (n - 1) // sum of all pairs shortest path lengths
+func testCompleteGraph(t *testing.T, summer Summer) {
+	for n := 2; n <= 100; n++ {
+		pairs := n * (n - 1)
+		paths := pairs
+		sum := pairs
 
 		node, a, component := buildCompleteGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func TestCompleteGraphV2(t *testing.T) {
-	for n := 1; n <= 100; n++ {
-		pair1 := n * (n - 1)
-		path1 := n * (n - 1) // sum of all pairs shortest path lengths
+func TestCompleteGraphOneV1(t *testing.T) {
+	testCompleteGraph(t, sumAllSourcesShortestPathsV1)
+}
 
-		node, a, component := buildCompleteGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+func TestCompleteGraphOneV2(t *testing.T) {
+	testCompleteGraph(t, sumAllSourcesShortestPathsV2)
+}
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
+//
+// same values as table above for the All version
+//
+
+func TestCompleteGraphAllV1(t *testing.T) {
+	testCompleteGraph(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func TestCompleteGraphAllV2(t *testing.T) {
+	testCompleteGraph(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // Star graph, S_n
@@ -266,7 +208,7 @@ func TestCompleteGraphV2(t *testing.T) {
 func buildStarGraph(n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(n)
 
-	// build star graph adjacency lists
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for i := range a {
 		switch i {
@@ -283,50 +225,276 @@ func buildStarGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// Star graph counts
+// Star graph
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                sum of
-//      n  pairs   paths
-//      1:     0       0
-//      2:     2       2
-//      3:     6       8
-//      4:    12      18
-//      5:    20      32
-//      6:    30      50
-//      7:    42      72
-//      8:    56      98
-//             ⋮
-//    197: 38612   76832
-//    198: 39006   77618
-//    199: 39402   78408
-//    200: 39800   79202
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      1:       0          0          0
+//      2:       2          2          2
+//      3:       6          6          8
+//      4:      12         12         18
+//      5:      20         20         32
+//      6:      30         30         50
+//      7:      42         42         72
+//      8:      56         56         98
+//      9:      72         72        128
+//     10:      90         90        162
+//               ⋮
+//     97:    9312       9312      18432
+//     98:    9506       9506      18818
+//     99:    9702       9702      19208
+//    100:    9900       9900      19602
 
-func TestStarGraphV1(t *testing.T) {
-	for n := 1; n <= 200; n++ {
-		pair1 := n * (n - 1)
-		path1 := 2 * (n - 1) * (n - 1) // sum of all pairs shortest path lengths
+func testStarGraph(t *testing.T, summer Summer) {
+	for n := 1; n <= 100; n++ {
+		pairs := n * (n - 1)
+		paths := pairs
+		sum := 2 * (n - 1) * (n - 1)
 
 		node, a, component := buildStarGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func TestStarGraphV2(t *testing.T) {
-	for n := 1; n <= 200; n++ {
-		pair1 := n * (n - 1)
-		path1 := 2 * (n - 1) * (n - 1) // sum of all pairs shortest path lengths
+func TestStarGraphOneV1(t *testing.T) {
+	testStarGraph(t, sumAllSourcesShortestPathsV1)
+}
 
-		node, a, component := buildStarGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+func TestStarGraphOneV2(t *testing.T) {
+	testStarGraph(t, sumAllSourcesShortestPathsV2)
+}
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+//
+// same values as table above for the All version
+//
+
+func TestStarGraphAllV1(t *testing.T) {
+	testStarGraph(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func TestStarGraphAllV2(t *testing.T) {
+	testStarGraph(t, sumAllSourcesAllShortestPathsV2)
+}
+
+// Complete binary tree, T_n (full, same height, all leaves full)
+// http://en.wikipedia.org/wiki/Binary_tree
+func buildCompleteBinaryTree(height int) ([]string, []Indexes, []Component) {
+	n := (1 << uint(height+1)) - 1 // 2**(height+1) - 1
+	node, component := buildGraph(n)
+
+	// build adjacency lists
+	a := make([]Indexes, n)
+	for i := range a {
+		switch {
+		case i == 0: // root
+			a[i] = []Index{
+				Index(2*i + 1), // left child
+				Index(2*i + 2), // right child
+			}
+		case i < n/2: // internal
+			a[i] = []Index{
+				Index(2*i + 1),     // left child
+				Index(2*i + 2),     // right child
+				Index((i - 1) / 2), // parent
+			}
+		default: // leaf
+			a[i] = []Index{
+				Index((i - 1) / 2), // parent
+			}
 		}
 	}
+
+	return node, a, component
+}
+
+// Complete binary tree
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the height of the tree
+//
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      1:       6          6          8
+//      2:      42         42         96
+//      3:     210        210        736
+//      4:     930        930       4608
+//      5:    3906       3906      25728
+//      6:   16002      16002     133632
+//      7:   64770      64770     660992
+//      8:  260610     260610    3158016
+//      9: 1045506    1045506   14706688
+//     10: 4188162    4188162   67166208
+
+func testBinaryTree(t *testing.T, summer Summer) {
+	for n := 1; n <= 8; n++ {
+		p := 1 << uint(n+1) // 2**(n+1)
+		pairs := (p - 1) * (p - 2)
+		paths := pairs
+		sum := 2 * p * ((n-2)*(p+1) + 6)
+
+		node, a, component := buildCompleteBinaryTree(n)
+		pairs2, paths2, sum2 := summer(node, a, component)
+
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%12d, %12d, %12d), computed (%12d, %12d, %12d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
+		}
+	}
+}
+
+func TestBinaryTreeOneV1(t *testing.T) {
+	testBinaryTree(t, sumAllSourcesShortestPathsV1)
+}
+
+func TestBinaryTreeOneV2(t *testing.T) {
+	testBinaryTree(t, sumAllSourcesShortestPathsV2)
+}
+
+//
+// same values as table above for the All version
+//
+
+func TestBinaryTreeAllV1(t *testing.T) {
+	testBinaryTree(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func TestBinaryTreeAllV2(t *testing.T) {
+	testBinaryTree(t, sumAllSourcesAllShortestPathsV2)
+}
+
+// Cycle graph, C_n
+// http://en.wikipedia.org/wiki/Cycle_graph
+//
+// 4 node cycle graph
+//
+//    O ---- O
+//    |      |
+//    |      |
+//    O ---- O
+
+func buildCycleGraph(n int) ([]string, []Indexes, []Component) {
+	node, component := buildGraph(n)
+
+	// build adjacency lists
+	a := make([]Indexes, n)
+	for i := range a {
+		a[i] = []Index{
+			Index((i - 1 + n) % n),
+			Index((i + 1) % n),
+		}
+	}
+
+	return node, a, component
+}
+
+// Cycle graph one
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
+//
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      3:       6          6          6
+//      4:      12         12         16
+//      5:      20         20         30
+//      6:      30         30         54
+//      7:      42         42         84
+//      8:      56         56        128
+//      9:      72         72        180
+//     10:      90         90        250
+//               ⋮
+//     97:    9312       9312     228144
+//     98:    9506       9506     235298
+//     99:    9702       9702     242550
+//    100:    9900       9900     250000
+
+func testCycleGraphOne(t *testing.T, summer Summer) {
+	for n := 3; n <= 100; n++ {
+		pairs := n * (n - 1)
+		paths := pairs
+
+		var sum int
+		switch n & 1 {
+		case 0:
+			sum = (n * n * n) / 4
+		case 1:
+			sum = (n * (n*n - 1)) / 4
+		}
+
+		node, a, component := buildCycleGraph(n)
+		pairs2, paths2, sum2 := summer(node, a, component)
+
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
+		}
+	}
+}
+
+func TestCycleGraphOneV1(t *testing.T) {
+	testCycleGraphOne(t, sumAllSourcesShortestPathsV1)
+}
+
+func TestCycleGraphOneV2(t *testing.T) {
+	testCycleGraphOne(t, sumAllSourcesShortestPathsV2)
+}
+
+// Cycle graph all
+// Sums of all shortest-length paths between each pair
+// Parameterized by n, the number of nodes
+//
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      3:       6          6          6
+//      4:      12         16         24
+//      5:      20         20         30
+//      6:      30         36         72
+//      7:      42         42         84
+//      8:      56         64        160
+//      9:      72         72        180
+//     10:      90        100        300
+//     11:     110        110        330
+//               ⋮
+//     97:    9312       9312     228144
+//     98:    9506       9604     240100
+//     99:    9702       9702     242550
+//    100:    9900      10000     255000
+
+func testCycleGraphAll(t *testing.T, summer Summer) {
+	for n := 3; n <= 100; n++ {
+		var pairs, paths, sum int
+
+		pairs = n * (n - 1)
+		switch n & 1 {
+		case 0: // even
+			paths = n * n               // one extra path per pair...
+			sum = (n * n * (n + 2)) / 4 // ..each one of length n/2
+		case 1: // odd
+			paths = n * (n - 1)
+			sum = (n * (n*n - 1)) / 4
+		}
+
+		node, a, component := buildCycleGraph(n)
+		pairs2, paths2, sum2 := summer(node, a, component)
+
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
+		}
+	}
+}
+
+func TestCycleGraphAllV1(t *testing.T) {
+	testCycleGraphAll(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func TestCycleGraphAllV2(t *testing.T) {
+	testCycleGraphAll(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // Wheel graph, W_n
@@ -345,7 +513,7 @@ func TestStarGraphV2(t *testing.T) {
 func buildWheelGraph(n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(n)
 
-	// build wheel graph adjacency lists
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for i := range a {
 		switch i {
@@ -366,50 +534,99 @@ func buildWheelGraph(n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// Wheel graph counts
+// Wheel graph one
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                sum of
-//      n  pairs   paths
-//      4:    12      12
-//      5:    20      24
-//      6:    30      40
-//      7:    42      60
-//      8:    56      84
-//      9:    72     112
-//     10:    90     144
-//     11:   110     180
-//             ⋮
-//    297: 87912  174640
-//    298: 88506  175824
-//    299: 89102  177012
-//    300: 89700  178204
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      4:      12         12         12
+//      5:      20         20         24
+//      6:      30         30         40
+//      7:      42         42         60
+//      8:      56         56         84
+//      9:      72         72        112
+//     10:      90         90        144
+//     11:     110        110        180
+//               ⋮
+//     97:    9312       9312      18240
+//     98:    9506       9506      18624
+//     99:    9702       9702      19012
+//    100:    9900       9900      19404
 
-func TestWheelGraphV1(t *testing.T) {
-	for n := 4; n <= 300; n++ {
-		pair1 := n * (n - 1)
-		path1 := 2 * (n - 1) * (n - 2) // sum of all pairs shortest path lengths
+func testWheelGraphOne(t *testing.T, summer Summer) {
+	for n := 4; n <= 100; n++ {
+		pairs := n * (n - 1)
+		paths := pairs
+		sum := 2 * (n - 1) * (n - 2)
 
 		node, a, component := buildWheelGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func TestWheelGraphV2(t *testing.T) {
-	for n := 4; n <= 300; n++ {
-		pair1 := n * (n - 1)
-		path1 := 2 * (n - 1) * (n - 2) // sum of all pairs shortest path lengths
+func TestWheelGraphOneV1(t *testing.T) {
+	testWheelGraphOne(t, sumAllSourcesShortestPathsV1)
+}
+
+func TestWheelGraphOneV2(t *testing.T) {
+	testWheelGraphOne(t, sumAllSourcesShortestPathsV2)
+}
+
+// Wheel graph all
+// Counting all shortest paths between each pair
+// Parameterized by n, the number of nodes
+//
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      4:      12         12         12
+//      5:      20         28         40
+//      6:      30         40         60
+//      7:      42         54         84
+//      8:      56         70        112
+//      9:      72         88        144
+//     10:      90        108        180
+//     11:     110        130        220
+//               ⋮
+//     97:    9312       9504      18624
+//     98:    9506       9700      19012
+//     99:    9702       9898      19404
+//    100:    9900      10098      19800
+
+func testWheelGraphAll(t *testing.T, summer Summer) {
+	for n := 4; n <= 100; n++ {
+		var pairs, paths, sum int
+		pairs = n * (n - 1)
+		switch n {
+		case 4:
+			paths = 12
+			sum = 12
+		default:
+			paths = (n + 2) * (n - 1)
+			sum = 2 * n * (n - 1)
+		}
 
 		node, a, component := buildWheelGraph(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%4d, %4d, %4d), computed (%4d, %4d, %4d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
+}
+
+func TestWheelGraphAllV1(t *testing.T) {
+	testWheelGraphAll(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func TestWheelGraphAllV2(t *testing.T) {
+	testWheelGraphAll(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // 2DGrid graph (grid graph, square grid graph)
@@ -427,6 +644,7 @@ func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
 	n := nx * ny
 	node, component := buildGraph(n)
 
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for y := 0; y < ny; y++ {
 		for x := 0; x < nx; x++ {
@@ -443,58 +661,99 @@ func build2DGridGraph(nx, ny int) ([]string, []Indexes, []Component) {
 			if y < ny-1 {
 				a[i] = append(a[i], Index((y+1)*nx+x)) // +Y
 			}
-
 		}
 	}
 
 	return node, a, component
 }
 
-// 2DGrid graph counts
+// 2D Grid graph one
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                   sum of
-//           pairs    paths
-//      1:       0        0
-//      2:      12       16
-//      3:      72      144
-//      4:     240      640
-//      5:     600     2000
-//      6:    1260     5040
-//      7:    2352    10976
-//      8:    4032    21504
-//             ⋮
-//     37: 1872792 46195536
-//     38: 2083692 52786864
-//     39: 2311920 60109920
-//     40: 2558400 68224000
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      2:      12         12         16
+//      3:      72         72        144
+//      4:     240        240        640
+//      5:     600        600       2000
+//      6:    1260       1260       5040
+//      7:    2352       2352      10976
+//      8:    4032       4032      21504
+//               ⋮
+//     17:   83232      83232     943296
+//     18:  104652     104652    1255824
+//     19:  129960     129960    1646160
+//     20:  159600     159600    2128000
 
-func Test2DGridGraphV1(t *testing.T) {
-	for n := 1; n <= 20; n++ {
-		pair1 := (n * n) * (n*n - 1)
-		// sum of all pairs shortest path lengths (tricky to derive with pencil and paper)
-		path1 := (2 * n * n * n * (n*n - 1)) / 3
+func test2DGraphOne(t *testing.T, summer Summer) {
+	for n := 1; n <= 10; n++ {
+		pairs := (n * n) * (n*n - 1)
+		paths := pairs
+		sum := (2 * n * n * n * (n*n - 1)) / 3
 
 		node, a, component := build2DGridGraph(n, n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%d, %d, %d), computed (%d, %d, %d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func Test2DGridGraphV2(t *testing.T) {
-	for n := 2; n <= 20; n++ {
-		pair1 := (n * n) * (n*n - 1)
-		path1 := (2 * n * n * n * (n*n - 1)) / 3
+func Test2DGridGraphOneV1(t *testing.T) {
+	test2DGraphOne(t, sumAllSourcesShortestPathsV1)
+}
 
-		node, a, component := build2DGridGraph(n, n) // square n x n lattice
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+func Test2DGridGraphOneV2(t *testing.T) {
+	test2DGraphOne(t, sumAllSourcesShortestPathsV2)
+}
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+func test2DGraphAll(t *testing.T, summer Summer) {
+	for n := 1; n <= 10; n++ {
+		pairs, paths, sum := grid2DAll(n, n)
+
+		node, a, component := build2DGridGraph(n, n)
+		pairs2, paths2, sum2 := summer(node, a, component)
+
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%12d, %12d, %12d), computed (%12d, %12d, %12d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
+}
+
+// determine pairs, paths, and sum of lengths analytically
+func grid2DAll(width, height int) (int, int, int) {
+	pairs := 0
+	paths := 0
+	sum := 0
+	for w1 := 0; w1 < width; w1++ {
+		for w2 := 0; w2 < width; w2++ {
+			w := absInt(w1 - w2)
+			for h1 := 0; h1 < height; h1++ {
+				for h2 := 0; h2 < height; h2++ {
+					h := absInt(h1 - h2)
+					if w+h > 0 {
+						ways := C(w+h, w)
+						pairs++
+						paths += ways
+						sum += ways * (w + h)
+					}
+				}
+			}
+		}
+	}
+	return pairs, paths, sum
+}
+
+func Test2DGridGraphAllV1(t *testing.T) {
+	test2DGraphAll(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func Test2DGridGraphAllV2(t *testing.T) {
+	test2DGraphAll(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // 3DGrid graph (grid graph, square grid graph)
@@ -504,6 +763,7 @@ func build3DGridGraph(nx, ny, nz int) ([]string, []Indexes, []Component) {
 	n := nx * ny * nz
 	node, component := buildGraph(n)
 
+	// build adjacency lists
 	a := make([]Indexes, n)
 	for z := 0; z < nz; z++ {
 		for y := 0; y < ny; y++ {
@@ -534,52 +794,98 @@ func build3DGridGraph(nx, ny, nz int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// 3DGrid graph counts
+// 3D Grid graph
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                   sum of
-//           pairs    paths
-//      1:       0        0
-//      2:      12       16
-//      3:      72      144
-//      4:     240      640
-//      5:     600     2000
-//      6:    1260     5040
-//      7:    2352    10976
-//      8:    4032    21504
-//             ⋮
-//     37: 1872792 46195536
-//     38: 2083692 52786864
-//     39: 2311920 60109920
-//     40: 2558400 68224000
+//                   shortest     sum of
+//      n    pairs      paths    lengths
+//      2:      56         56         96
+//      3:     702        702       1944
+//      4:    4032       4032      15360
+//      5:   15500      15500      75000
+//      6:   46440      46440     272160
+//      7:  117306     117306     806736
+//               ⋮
+//     11: 1770230    1770230   19326120
+//     12: 2984256    2984256   35582976
+//     13: 4824612    4824612   62377224
+//     14: 7526792    7526792  104875680
 
-func Test3DGridGraphV1(t *testing.T) {
-	// test paths on cubic n x n x n lattices
-	for n := 1; n <= 14; n++ {
-		pair1 := (n * n * n) * (n*n*n - 1)
-		path1 := n * n * n * n * n * (n*n - 1)
+func test3DGridGraphOne(t *testing.T, summer Summer) {
+	for n := 2; n <= 5; n++ {
+		pairs := (n * n * n) * (n*n*n - 1)
+		paths := pairs
+		sum := n * n * n * n * n * (n*n - 1)
 
 		node, a, component := build3DGridGraph(n, n, n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%12d, %12d, %12d), computed (%12d, %12d, %12d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
 }
 
-func Test3DGridGraphV2(t *testing.T) {
-	// test paths on cubic n x n x n lattices
-	for n := 1; n <= 14; n++ {
-		pair1 := (n * n * n) * (n*n*n - 1)
-		path1 := n * n * n * n * n * (n*n - 1)
+func Test3DGridGraphOneV1(t *testing.T) {
+	test3DGridGraphOne(t, sumAllSourcesShortestPathsV1)
+}
+
+func Test3DGridGraphOneV2(t *testing.T) {
+	test3DGridGraphOne(t, sumAllSourcesShortestPathsV2)
+}
+
+func test3DGridGraphAll(t *testing.T, summer Summer) {
+	for n := 2; n <= 5; n++ {
+		pairs, paths, sum := grid3DAll(n, n, n)
 
 		node, a, component := build3DGridGraph(n, n, n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+		pairs2, paths2, sum2 := summer(node, a, component)
 
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
+		if pairs != pairs2 || paths != paths2 || sum != sum2 {
+			t.Errorf("%2d: expected (%12d, %12d, %12d), computed (%12d, %12d, %12d)",
+				n, pairs, paths, sum, pairs2, paths2, sum2)
 		}
 	}
+}
+
+// determine pairs, paths, and sum of lengths analytically
+func grid3DAll(width, height, depth int) (int, int, int) {
+	pairs := 0
+	paths := 0
+	sum := 0
+	for w1 := 0; w1 < width; w1++ {
+		for w2 := 0; w2 < width; w2++ {
+			w := absInt(w1 - w2)
+			for h1 := 0; h1 < height; h1++ {
+				for h2 := 0; h2 < height; h2++ {
+					h := absInt(h1 - h2)
+					for d1 := 0; d1 < depth; d1++ {
+						for d2 := 0; d2 < depth; d2++ {
+							d := absInt(d1 - d2)
+							if w+h+d > 0 {
+								// multinomial (w+h+d; w,h,d)
+								ways := C(w+h+d, w) * C(h+d, h)
+								pairs++
+								paths += ways
+								sum += ways * (w + h + d)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return pairs, paths, sum
+}
+
+func Test3DGridGraphAllV1(t *testing.T) {
+	test3DGridGraphAll(t, sumAllSourcesAllShortestPathsV1)
+}
+
+func Test3DGridGraphAllV2(t *testing.T) {
+	test3DGridGraphAll(t, sumAllSourcesAllShortestPathsV2)
 }
 
 // Complete bipartite graph, K_{m,n}
@@ -597,7 +903,7 @@ func Test3DGridGraphV2(t *testing.T) {
 func buildCompleteBipartiteGraph(m, n int) ([]string, []Indexes, []Component) {
 	node, component := buildGraph(m + n)
 
-	// build complete bipartite graph adjacency lists
+	// build adjacency lists
 	ms := make(Indexes, m)
 	for i := range ms { // all the M nodes
 		ms[i] = Index(i)
@@ -617,130 +923,94 @@ func buildCompleteBipartiteGraph(m, n int) ([]string, []Indexes, []Component) {
 	return node, a, component
 }
 
-// Complete bipartate graph counts
+// Complete bipartite graph
+// Sums of the shortest-length path between each pair
+// Parameterized by n, the number of nodes
 //
-//                  sum of
-//  m  n    pairs    paths
-// 20, 1:     420      800
-// 20, 2:     462      844
-// 20, 3:     506      892
-// 20, 4:     552      944
-// 20, 5:     600     1000
-// 20, 6:     650     1060
-// 20, 7:     702     1124
-// 20, 8:     756     1192
-// 20, 9:     812     1264
-// 20,10:     870     1340
+//                    shortest     sum of
+//   m  n     pairs      paths    lengths
+// {20, 1}:     420        420        800
+// {20, 2}:     462        462        844
+// {20, 3}:     506        506        892
+// {20, 4}:     552        552        944
+// {20, 5}:     600        600       1000
+// {20, 6}:     650        650       1060
+// {20, 7}:     702        702       1124
+// {20, 8}:     756        756       1192
+// {20, 9}:     812        812       1264
+// {20,10}:     870        870       1340
 
-func TestBipartiteGraphV1(t *testing.T) {
-	for m := 1; m <= 30; m++ {
-		for n := 1; n <= 30; n++ {
-			pair1 := (m + n) * (m + n - 1)
-			path1 := 2 * (m*(m-1) + m*n + n*(n-1)) // sum of all pairs shortest path lengths
+func testBipartiteGraphOne(t *testing.T, summer Summer) {
+	for m := 1; m <= 20; m++ {
+		for n := 1; n <= 20; n++ {
+			pairs := (m + n) * (m + n - 1)
+			paths := pairs
+			sum := 2 * (m*(m-1) + m*n + n*(n-1))
 
 			node, a, component := buildCompleteBipartiteGraph(m, n)
-			pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
+			pairs2, paths2, sum2 := summer(node, a, component)
 
-			if pair1 != pair2 || path1 != path2 {
-				t.Errorf("%dx%d: expect (%d, %d) computed (%d, %d)", m, n, pair1, path1, pair2, path2)
+			if pairs != pairs2 || paths != paths2 || sum != sum2 {
+				t.Errorf("{%2d,%2d}: expected (%d, %d, %d), computed (%d, %d, %d)",
+					m, n, pairs, paths, sum, pairs2, paths2, sum2)
 			}
 		}
 	}
 }
 
-func TestBipartiteGraphV2(t *testing.T) {
-	for m := 1; m <= 30; m++ {
-		for n := 1; n <= 30; n++ {
-			pair1 := (m + n) * (m + n - 1)
-			path1 := 2 * (m*(m-1) + m*n + n*(n-1)) // sum of all pairs shortest path lengths
+func TestBipartiteGraphOneV1(t *testing.T) {
+	testBipartiteGraphOne(t, sumAllSourcesShortestPathsV1)
+}
+
+func TestBipartiteGraphOneV2(t *testing.T) {
+	testBipartiteGraphOne(t, sumAllSourcesShortestPathsV2)
+}
+
+// Complete bipartite graph
+// Counting all shortest paths between each pair
+// Parameterized by n, the number of nodes
+//
+//                    shortest     sum of
+//   m  n     pairs      paths    lengths
+// {20, 1}:     420        420        800
+// {20, 2}:     462        880       1680
+// {20, 3}:     506       1380       2640
+// {20, 4}:     552       1920       3680
+// {20, 5}:     600       2500       4800
+// {20, 6}:     650       3120       6000
+// {20, 7}:     702       3780       7280
+// {20, 8}:     756       4480       8640
+// {20, 9}:     812       5220      10080
+// {20,10}:     870       6000      11600
+
+func testBipartiteGraphAll(t *testing.T, summer Summer) {
+	for m := 1; m <= 20; m++ {
+		for n := 1; n <= 20; n++ {
+			pairs := (m + n) * (m + n - 1)
+			paths := m * n * (m + n)
+			sum := 2 * m * n * (m + n - 1)
 
 			node, a, component := buildCompleteBipartiteGraph(m, n)
-			pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
+			pairs2, paths2, sum2 := summer(node, a, component)
 
-			if pair1 != pair2 || path1 != path2 {
-				t.Errorf("%dx%d: expect (%d, %d) computed (%d, %d)", m, n, pair1, path1, pair2, path2)
+			if pairs != pairs2 || paths != paths2 || sum != sum2 {
+				t.Errorf("{%2d,%2d}: expected (%6d, %6d, %6d), computed (%6d, %6d, %6d)",
+					m, n, pairs, paths, sum, pairs2, paths2, sum2)
 			}
 		}
 	}
 }
 
-// Complete binary tree, T_n (full, same height, all leaves full)
-// http://en.wikipedia.org/wiki/Binary_tree
-func buildCompleteBinaryTree(height int) ([]string, []Indexes, []Component) {
-	n := (1 << uint(height+1)) - 1 // 2**(height+1) - 1
-	node, component := buildGraph(n)
-
-	// build path graph adjacency lists
-	a := make([]Indexes, n)
-	for i := range a {
-		switch {
-		case i == 0: // root
-			a[i] = []Index{
-				Index(2*i + 1), // left child
-				Index(2*i + 2), // right child
-			}
-		case i < n/2: // internal
-			a[i] = []Index{
-				Index(2*i + 1),     // left child
-				Index(2*i + 2),     // right child
-				Index((i - 1) / 2), // parent
-			}
-		default: // leaf
-			a[i] = []Index{
-				Index((i - 1) / 2), // parent
-			}
-		}
-	}
-
-	return node, a, component
+func TestBipartiteGraphAllV1(t *testing.T) {
+	testBipartiteGraphAll(t, sumAllSourcesAllShortestPathsV1)
 }
 
-// Complete binary tree counts
-//
-//                    sum of
-// height   pairs      paths
-//      1:       6         8
-//      2:      42        96
-//      3:     210       736
-//      4:     930      4608
-//      5:    3906     25728
-//      6:   16002    133632
-//      7:   64770    660992
-//      8:  260610   3158016
-//      9: 1045506  14706688
-//     10: 4188162  67166208
-
-func TestBinaryTreeV1(t *testing.T) {
-	// test paths on square n x n lattic11es
-	for n := 1; n <= 10; n++ {
-		p := 1 << uint(n+1) // 2**(n+1)
-		pair1 := (p - 1) * (p - 2)
-		path1 := 2 * p * ((n-2)*(p+1) + 6)
-
-		node, a, component := buildCompleteBinaryTree(n)
-		pair2, path2 := sumAllSourcesShortestPathsV1(node, a, component)
-
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
+func TestBipartiteGraphAllV2(t *testing.T) {
+	testBipartiteGraphAll(t, sumAllSourcesAllShortestPathsV2)
 }
 
-func TestBinaryTreeV2(t *testing.T) {
-	// test paths on square n x n lattic11es
-	for n := 1; n <= 10; n++ {
-		p := 1 << uint(n+1) // 2**(n+1)
-		pair1 := (p - 1) * (p - 2)
-		path1 := 2 * p * ((n-2)*(p+1) + 6)
-
-		node, a, component := buildCompleteBinaryTree(n)
-		pair2, path2 := sumAllSourcesShortestPathsV2(node, a, component)
-
-		if pair1 != pair2 || path1 != path2 {
-			t.Errorf("%2d: expect (%d, %d) computed (%d, %d)", n, pair1, path1, pair2, path2)
-		}
-	}
-}
+// fmt.Printf("//   %4d: %7d %10d %10d\n", n, pairs, paths, sum)
+// fmt.Printf("// {%2d,%2d}: %7d %10d %10d\n", m, n, pairs, paths, sum)
 
 //
 // BENCHMARKS
