@@ -712,7 +712,7 @@ func Test2DGridGraphOneV2(t *testing.T) {
 
 func test2DGraphAll(t *testing.T, summer Summer) {
 	for n := 1; n <= 10; n++ {
-		pairs, paths, sum := grid2DAll(n, n)
+		pairs, paths, sum := grid2DAllV2(n, n)
 
 		node, a, component := build2DGridGraph(n, n)
 		pairs2, paths2, sum2 := summer(node, a, component)
@@ -742,6 +742,34 @@ func grid2DAll(width, height int) (int, int, int) {
 						sum += ways * (w + h)
 					}
 				}
+			}
+		}
+	}
+	return pairs, paths, sum
+}
+
+// determine pairs, paths, and sum of lengths analytically
+func grid2DAllV2(width, height int) (int, int, int) {
+	pairs := 0
+	paths := 0
+	sum := 0
+	pairs = (width * height) * (width*height - 1)
+	for w := 0; w < width; w++ {
+		for h := 0; h < height; h++ {
+			if w+h > 0 {
+				tiles := (width - w) * (height - h) // number of instances of this size
+				ways := C(w+h, w)                   // economize calls to C()
+
+				flip := 1
+				if w > 0 {
+					flip *= 2
+				}
+				if h > 0 {
+					flip *= 2
+				}
+
+				paths += flip * tiles * ways
+				sum += flip * tiles * ways * (w + h)
 			}
 		}
 	}
@@ -1342,11 +1370,13 @@ func benchmarkSum2DGridV1(b *testing.B, n int) {
 	}
 }
 
+func BenchmarkSum2DGridV1_4(b *testing.B)   { benchmarkSum2DGridV1(b, 4) }
+func BenchmarkSum2DGridV1_6(b *testing.B)   { benchmarkSum2DGridV1(b, 6) }
+func BenchmarkSum2DGridV1_8(b *testing.B)   { benchmarkSum2DGridV1(b, 8) }
 func BenchmarkSum2DGridV1_10(b *testing.B)  { benchmarkSum2DGridV1(b, 10) }
+func BenchmarkSum2DGridV1_12(b *testing.B)  { benchmarkSum2DGridV1(b, 12) }
 func BenchmarkSum2DGridV1_20(b *testing.B)  { benchmarkSum2DGridV1(b, 20) }
-func BenchmarkSum2DGridV1_30(b *testing.B)  { benchmarkSum2DGridV1(b, 30) }
 func BenchmarkSum2DGridV1_40(b *testing.B)  { benchmarkSum2DGridV1(b, 40) }
-func BenchmarkSum2DGridV1_50(b *testing.B)  { benchmarkSum2DGridV1(b, 50) }
 func BenchmarkSum2DGridV1_60(b *testing.B)  { benchmarkSum2DGridV1(b, 60) }
 func BenchmarkSum2DGridV1_70(b *testing.B)  { benchmarkSum2DGridV1(b, 70) }
 func BenchmarkSum2DGridV1_80(b *testing.B)  { benchmarkSum2DGridV1(b, 80) }
@@ -1362,16 +1392,48 @@ func benchmarkSum2DGridV2(b *testing.B, n int) {
 	}
 }
 
+func BenchmarkSum2DGridV2_4(b *testing.B)   { benchmarkSum2DGridV2(b, 4) }
+func BenchmarkSum2DGridV2_6(b *testing.B)   { benchmarkSum2DGridV2(b, 6) }
+func BenchmarkSum2DGridV2_8(b *testing.B)   { benchmarkSum2DGridV2(b, 8) }
 func BenchmarkSum2DGridV2_10(b *testing.B)  { benchmarkSum2DGridV2(b, 10) }
+func BenchmarkSum2DGridV2_12(b *testing.B)  { benchmarkSum2DGridV2(b, 12) }
 func BenchmarkSum2DGridV2_20(b *testing.B)  { benchmarkSum2DGridV2(b, 20) }
-func BenchmarkSum2DGridV2_30(b *testing.B)  { benchmarkSum2DGridV2(b, 30) }
 func BenchmarkSum2DGridV2_40(b *testing.B)  { benchmarkSum2DGridV2(b, 40) }
-func BenchmarkSum2DGridV2_50(b *testing.B)  { benchmarkSum2DGridV2(b, 50) }
 func BenchmarkSum2DGridV2_60(b *testing.B)  { benchmarkSum2DGridV2(b, 60) }
 func BenchmarkSum2DGridV2_70(b *testing.B)  { benchmarkSum2DGridV2(b, 70) }
 func BenchmarkSum2DGridV2_80(b *testing.B)  { benchmarkSum2DGridV2(b, 80) }
 func BenchmarkSum2DGridV2_90(b *testing.B)  { benchmarkSum2DGridV2(b, 90) }
 func BenchmarkSum2DGridV2_100(b *testing.B) { benchmarkSum2DGridV2(b, 100) }
+
+func benchmarkSumAll2DGridV1(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesAllShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSumAll2DGridV1_4(b *testing.B)  { benchmarkSumAll2DGridV1(b, 4) }
+func BenchmarkSumAll2DGridV1_6(b *testing.B)  { benchmarkSumAll2DGridV1(b, 6) }
+func BenchmarkSumAll2DGridV1_8(b *testing.B)  { benchmarkSumAll2DGridV1(b, 8) }
+func BenchmarkSumAll2DGridV1_10(b *testing.B) { benchmarkSumAll2DGridV1(b, 10) }
+func BenchmarkSumAll2DGridV1_12(b *testing.B) { benchmarkSumAll2DGridV1(b, 12) }
+
+func benchmarkSumAll2DGridV2(b *testing.B, n int) {
+	node, a, component := build2DGridGraph(n, n)
+	b.ResetTimer()
+
+	for BN := 0; BN < b.N; BN++ {
+		sumAllSourcesAllShortestPathsV1(node, a, component)
+	}
+}
+
+func BenchmarkSumAll2DGridV2_4(b *testing.B)  { benchmarkSumAll2DGridV2(b, 4) }
+func BenchmarkSumAll2DGridV2_6(b *testing.B)  { benchmarkSumAll2DGridV2(b, 6) }
+func BenchmarkSumAll2DGridV2_8(b *testing.B)  { benchmarkSumAll2DGridV2(b, 8) }
+func BenchmarkSumAll2DGridV2_10(b *testing.B) { benchmarkSumAll2DGridV2(b, 10) }
+func BenchmarkSumAll2DGridV2_12(b *testing.B) { benchmarkSumAll2DGridV2(b, 12) }
 
 // func benchmarkSum3DGridV1(b *testing.B, n int) {
 // 	node, a, component := build3DGridGraph(n, n, n)
